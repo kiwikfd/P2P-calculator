@@ -338,7 +338,7 @@ window.cloudOff=function(){ref=null;$('st').textContent='· данные в бр
 </script>
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-import {getAuth,GoogleAuthProvider,signInWithPopup,signOut,onAuthStateChanged} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+import {getAuth,GoogleAuthProvider,signInWithPopup,signInWithRedirect,getRedirectResult,signOut,onAuthStateChanged} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 import {getFirestore,doc,getDoc,setDoc} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -357,9 +357,21 @@ if(firebaseConfig.apiKey.startsWith("ВАШ")){
   const app=initializeApp(firebaseConfig);
   const auth=getAuth(app), db=getFirestore(app);
   btn.hidden=false;
-  btn.onclick=()=>auth.currentUser
-    ? signOut(auth)
-    : signInWithPopup(auth,new GoogleAuthProvider()).catch(e=>alert('Не удалось войти: '+e.code));
+  let busy=false;
+  getRedirectResult(auth).catch(e=>{if(e&&e.code)alert('Не удалось войти: '+e.code)});
+  btn.onclick=async()=>{
+    if(busy)return;
+    if(auth.currentUser){await signOut(auth);return}
+    busy=true;btn.disabled=true;
+    const p=new GoogleAuthProvider();
+    p.setCustomParameters({prompt:'select_account'});
+    try{await signInWithPopup(auth,p)}
+    catch(e){
+      if(['auth/popup-blocked','auth/cancelled-popup-request','auth/operation-not-supported-in-this-environment'].includes(e.code)){
+        try{await signInWithRedirect(auth,p);return}catch(e2){alert('Не удалось войти: '+e2.code)}
+      }else if(e.code!=='auth/popup-closed-by-user'){alert('Не удалось войти: '+e.code)}
+    }finally{busy=false;btn.disabled=false}
+  };
   onAuthStateChanged(auth,u=>{
     if(u){
       btn.textContent='Выйти ('+(u.displayName||u.email||'аккаунт')+')';
