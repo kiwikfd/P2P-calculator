@@ -18,6 +18,7 @@ html,body{height:100%;max-width:100%;overflow:hidden}
 body{margin:0;background:var(--bg);color:var(--tx);font:14px/1.4 -apple-system,Segoe UI,Roboto,Arial,sans-serif;font-variant-numeric:tabular-nums}
 main{height:100%;max-width:640px;margin:0 auto;padding:8px 12px 0;display:flex;flex-direction:column}
 .top{display:flex;justify-content:space-between;align-items:baseline;padding:0 4px 8px;flex:none}.top b{font-size:17px}.top span{font-size:11px;color:var(--mut)}
+.ico+.ico{margin-left:8px}.lm{position:fixed;top:calc(54px + env(safe-area-inset-top,0px));right:max(12px,calc(50% - 308px));z-index:25;display:flex;flex-direction:column;gap:2px;padding:6px;background:var(--s1);border:1px solid var(--bd);border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.3)}.lm button{background:transparent;color:var(--tx);text-align:left;padding:9px 14px;border-radius:10px;font-weight:600}.lm button.on{background:color-mix(in srgb,var(--ac) 18%,transparent);color:var(--ac)}
 .pairs{display:flex;gap:6px;overflow-x:auto;padding:0 2px 8px;flex:none;scrollbar-width:none}.pairs::-webkit-scrollbar{display:none}.pairs button{flex:none;padding:6px 12px;border-radius:99px;background:var(--s1);color:var(--mut);border:1px solid var(--bd);font-size:12px;font-weight:700}.pairs button.on{background:color-mix(in srgb,var(--ac) 18%,transparent);color:var(--ac);border-color:var(--ac)}
 .scr{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding-bottom:96px}
 #t_home{display:flex;flex-direction:column;overflow:hidden;padding-bottom:90px}
@@ -82,7 +83,8 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--ac);box-
 </head>
 <body>
 <main>
-<div class="top"><span class="lg"><svg viewBox="0 0 32 32"><defs><linearGradient id="lg2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4f7cff"/><stop offset="1" stop-color="#8b5cf6"/></linearGradient></defs><rect width="32" height="32" rx="9" fill="url(#lg2)"/><path d="M9 12h13l-3.5-3.5M23 20H10l3.5 3.5" stroke="#fff" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span><div class="tt"><b>USDT / UAH <small class="by">by qkumori</small></b><span id="st"></span></div><button class="ghost" id="auth" type="button" hidden>Войти через Google</button><button class="ico" id="thm" type="button" aria-label="Тема"></button></div>
+<div class="top"><span class="lg"><svg viewBox="0 0 32 32"><defs><linearGradient id="lg2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4f7cff"/><stop offset="1" stop-color="#8b5cf6"/></linearGradient></defs><rect width="32" height="32" rx="9" fill="url(#lg2)"/><path d="M9 12h13l-3.5-3.5M23 20H10l3.5 3.5" stroke="#fff" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span><div class="tt"><b>USDT / UAH <small class="by">by qkumori</small></b><span id="st"></span></div><button class="ghost" id="auth" type="button" hidden>Войти через Google</button><button class="ico" id="thm" type="button" aria-label="Тема"></button><button class="ico" id="lng" type="button" aria-label="Language" style="font-size:11px;font-weight:800"></button></div>
+<div class="lm" id="lm" hidden></div>
 
 <div class="pairs" id="pairs"></div>
 
@@ -184,6 +186,64 @@ const SYM={UAH:'₴',RUB:'₽',BYN:'Br',KZT:'₸',PLN:'zł',USD:'$',EUR:'€',GE
 const pe=()=>state.cur==='UAH'?null:(state.ps[state.cur]||(state.ps[state.cur]={start:{uah:0,usdt:0,rate:0},goal:0}));
 const st=()=>pe()?pe().start:state.start,pgoal=()=>pe()?pe().goal:state.goal;
 const setSt=v=>{if(pe())pe().start=v;else state.start=v},setGl=v=>{if(pe())pe().goal=v;else state.goal=v};
+let LANG='ru';try{LANG=localStorage.getItem('p2p_lang')||(/^uk/i.test(navigator.language)?'uk':/^en/i.test(navigator.language)?'en':'ru')}catch(e){}
+const I18N=[
+['Войти через Google','Увійти через Google','Sign in with Google'],['Выйти','Вийти','Sign out'],['аккаунт','акаунт','account'],
+['ошибка облака','помилка хмари','cloud error'],['сохранено только в браузере','збережено лише в браузері','saved in browser only'],['сохранено в аккаунте','збережено в акаунті','saved to account'],
+['данные в браузере','дані в браузері','data in browser'],['данные в аккаунте','дані в акаунті','data in account'],['учёт прибыли','облік прибутку','profit tracker'],
+['Браузер заблокировал окно входа','Браузер заблокував вікно входу','The browser blocked the sign-in window'],
+['Разрешите всплывающие окна для этого сайта и нажмите кнопку ещё раз','Дозвольте спливаючі вікна для цього сайту і натисніть кнопку ще раз','Allow pop-ups for this site and press the button again'],
+['Не удалось войти','Не вдалося увійти','Sign-in failed'],
+['Прибыль сегодня','Прибуток сьогодні','Profit today'],['Цель на день','Ціль на день','Daily goal'],['Прибыль по дням','Прибуток по днях','Profit by day'],
+['не задана','не задана','not set'],['вкладка','вкладка','tab'],['Ещё','Ще','More'],['из','з','of'],['дн.','дн.','d'],['всего','всього','total'],['Всего','Всього','Total'],
+['Баланс П2П','Баланс P2P','P2P balance'],['баланс П2П','баланс P2P','P2P balance'],['в обороте','в обігу','in circulation'],['Безубыточный курс','Беззбитковий курс','Break-even rate'],['Курс для','Курс для','Rate for'],
+['Ср. курс покупки','Сер. курс купівлі','Avg buy rate'],['Ср. курс продажи','Сер. курс продажу','Avg sell rate'],['Ср. себестоимость остатка','Сер. собівартість залишку','Avg cost of remainder'],
+['Продажа с комиссией','Продаж з комісією','Sell with fee'],['Спред с комиссией','Спред з комісією','Spread with fee'],['Комиссия всего','Комісія всього','Total fees'],['Скидки всего','Знижки всього','Total discounts'],
+['Оборот по себестоимости','Оборот за собівартістю','Turnover at cost'],['Прибыль всего','Прибуток всього','Total profit'],['Внесено','Внесено','Deposited'],['Выведено','Виведено','Withdrawn'],
+['лучший день','найкращий день','best day'],['худший','найгірший','worst'],
+['Покупка','Купівля','Buy'],['Продажа','Продаж','Sell'],['Пополнение','Поповнення','Deposit'],['Вывод','Виведення','Withdraw'],['покупка','купівля','buy'],['продажа','продаж','sell'],['пополнение','поповнення','deposit'],['вывод','виведення','withdrawal'],
+['Вставьте сообщение сделки из бота — оно разберётся само','Вставте повідомлення угоди з бота — воно розбереться саме','Paste the deal message from the bot — it is parsed automatically'],
+['USDT получено','USDT отримано','USDT received'],['USDT продано','USDT продано','USDT sold'],['Курс из бота','Курс з бота','Bot rate'],['за 1 USDT','за 1 USDT','per 1 USDT'],
+['Сумма пополнения','Сума поповнення','Deposit amount'],['Сумма вывода','Сума виведення','Withdrawal amount'],['по сделке','за угодою','per deal'],['Платите','Ви платите','You pay'],['получено','отримано','received'],['после комиссии','після комісії','after fee'],['потрачено','витрачено','spent'],
+['Была скидка','Була знижка','Was there a discount'],['Нет','Ні','No'],['Да','Так','Yes'],['Комиссия продажи','Комісія продажу','Sell fee'],['Заплатил по факту','Заплатив за фактом','Actually paid'],['Дата','Дата','Date'],['№ сделки','№ угоди','Deal No.'],
+['Дополнительно: банк, контрагент','Додатково: банк, контрагент','Extra: bank, counterparty'],['Способ оплаты / банк','Спосіб оплати / банк','Payment method / bank'],['Контрагент','Контрагент','Counterparty'],['ник из бота','нік з бота','nickname from bot'],
+['Добавить','Додати','Add'],['Отмена','Скасувати','Cancel'],['Сохранить изменения','Зберегти зміни','Save changes'],['Повторить прошлую сделку','Повторити минулу угоду','Repeat last deal'],
+['Курс покупки','Курс купівлі','Buy rate'],['Курс продажи','Курс продажу','Sell rate'],['Курс','Курс','Rate'],['курс','курс','rate'],['факт','факт','actual'],['скидка','знижка','discount'],['с комиссией','з комісією','with fee'],['комиссия','комісія','fee'],
+['Деньги заходят в оборот П2П','Гроші заходять в оборот P2P','Money enters P2P turnover'],['Деньги уходят на личные нужды','Гроші йдуть на особисті потреби','Money leaves for personal needs'],['растёт','зростає','grows'],['уменьшается','зменшується','decreases'],['прибыль не меняется','прибуток не змінюється','profit unchanged'],['баланс','баланс','balance'],
+['Не удалось разобрать текст','Не вдалося розібрати текст','Could not parse the text'],['Скопируйте сообщение сделки из бота целиком','Скопіюйте повідомлення угоди з бота повністю','Copy the whole deal message from the bot'],
+['уже внесена ранее','вже внесена раніше','already added earlier'],['уже внесена','вже внесена','already added'],['Распознано','Розпізнано','Recognized'],['дата не найдена','дату не знайдено','date not found'],['стоит выбранная','встановлено обрану','selected date used'],
+['Проверьте и нажмите','Перевірте і натисніть','Check and press'],['Если была скидка','Якщо була знижка','If there was a discount'],['выберите','оберіть','choose'],
+['Заполните дату и суммы','Заповніть дату і суми','Fill in date and amounts'],['больше нуля','більше нуля','greater than zero'],['Сделка добавлена','Угоду додано','Deal added'],['Изменения сохранены','Зміни збережено','Changes saved'],
+['Главная','Головна','Home'],['Сделка','Угода','Deal'],['Сделки','Угоди','Deals'],['Итоги','Підсумки','Stats'],
+['Всё','Усе','All'],['Сегодня','Сьогодні','Today'],['Прибыльная','Прибуткова','Profitable'],['Убыточная','Збиткова','Loss-making'],['В ноль','У нуль','Break-even'],['Нет сделок','Немає угод','No deals'],['нет сделок','немає угод','no deals'],['очистить','очистити','clear'],
+['Куплено','Куплено','Bought'],['Продано','Продано','Sold'],['Комиссия','Комісія','Fee'],['Скидка','Знижка','Discount'],['Скидки','Знижки','Discounts'],['сделок','угод','deals'],['Сделок','Угод','Deals'],['покупок','купівель','buys'],['продаж','продажів','sells'],
+['Дни','Дні','Days'],['Месяцы','Місяці','Months'],['Курсы','Курси','Rates'],['Баланс','Баланс','Balance'],['Банки','Банки','Banks'],
+['Отчёт текстом','Звіт текстом','Text report'],['Скопировать отчёт','Скопіювати звіт','Copy report'],['Скопировано','Скопійовано','Copied'],['Текст выделен','Текст виділено','Text selected'],['скопируйте вручную','скопіюйте вручну','copy manually'],['скопируйте','скопіюйте','copy'],
+['Если продать остаток','Якщо продати залишок','If you sell the rest'],['Курс продажи сейчас','Курс продажу зараз','Sell rate now'],['Введите курс','Введіть курс','Enter the rate'],['чтобы увидеть результат','щоб побачити результат','to see the result'],['Нет USDT в остатке','Немає USDT в залишку','No USDT left'],['получите','отримаєте','you get'],['Прибыль','Прибуток','Profit'],['по','по','at'],
+['Сверка с картой','Звірка з карткою','Card check'],['Реально на карте под П2П','Реально на картці під P2P','Actually on the card for P2P'],['По расчёту на карте под П2П','За розрахунком на картці під P2P','By calculation on the card for P2P'],['По расчёту','За розрахунком','By calculation'],['разница','різниця','difference'],['Записать разницу','Записати різницю','Record difference'],['Записать','Записати','Record'],['на','на','for'],['чтобы баланс совпал с картой','щоб баланс збігся з карткою','so the balance matches the card'],
+['По способу оплаты','За способом оплати','By payment method'],['По контрагентам','За контрагентами','By counterparty'],['Не указан','Не вказано','Not specified'],
+['П2П-отчёт','P2P-звіт','P2P report'],['Куплено','Куплено','Bought'],['ср.','сер.','avg'],['за','за','for'],['Скидки','Знижки','Discounts'],
+['Январь','Січень','January'],['Февраль','Лютий','February'],['Март','Березень','March'],['Апрель','Квітень','April'],['Май','Травень','May'],['Июнь','Червень','June'],['Июль','Липень','July'],['Август','Серпень','August'],['Сентябрь','Вересень','September'],['Октябрь','Жовтень','October'],['Ноябрь','Листопад','November'],['Декабрь','Грудень','December'],
+['Оформление','Оформлення','Appearance'],['Авто','Авто','Auto'],['Светлая','Світла','Light'],['Тёмная','Темна','Dark'],['Цвет акцента','Колір акценту','Accent color'],
+['Стартовый баланс П2П','Стартовий баланс P2P','Starting P2P balance'],['под П2П','під P2P','for P2P'],['USDT на балансе','USDT на балансі','USDT in balance'],['Курс этих','Курс цих','Rate of these'],['необязательно','необов’язково','optional'],['по ср. курсу покупок','за сер. курсом купівель','at avg buy rate'],['Сохранить','Зберегти','Save'],
+['Вносите только деньги','Вносьте лише гроші','Deposit only money'],['которые выделили под П2П','які виділили під P2P','that you set aside for P2P'],['Личные траты с карты на этот баланс не влияют','Особисті витрати з картки на цей баланс не впливають','Personal card spending does not affect this balance'],
+['Курс нужен для прибыли с продажи стартовых','Курс потрібен для прибутку з продажу стартових','The rate is needed for profit on selling starting'],['если пусто','якщо порожньо','if empty'],['берётся средний курс покупок','береться середній курс купівель','the average buy rate is used'],
+['Цели','Цілі','Goals'],['Желаемая прибыль','Бажаний прибуток','Target profit'],['Данные и копия','Дані та копія','Data & backup'],['Если вы вошли через','Якщо ви увійшли через','If you signed in with'],
+['данные хранятся в облаке и доступны на любом устройстве','дані зберігаються в хмарі й доступні на будь-якому пристрої','data is stored in the cloud and available on any device'],['Без входа они только в браузере этого устройства','Без входу вони лише в браузері цього пристрою','Without signing in they stay only in this device’s browser'],['Копия','Копія','Backup'],['запасной вариант','запасний варіант','fallback'],
+['Здесь появится текст копии','Тут з’явиться текст копії','The backup text will appear here'],['Для восстановления вставьте его сюда','Для відновлення вставте його сюди','To restore, paste it here'],
+['Показать','Показати','Show'],['Скопировать','Копіювати','Copy'],['Восстановить','Відновити','Restore'],['Скопируйте этот текст и сохраните в заметках','Скопіюйте цей текст і збережіть у нотатках','Copy this text and save it in notes'],['Текст копии не распознан','Текст копії не розпізнано','Backup text not recognized'],
+['Заменить текущие данные данными из копии','Замінити поточні дані даними з копії','Replace current data with data from the backup'],['Данные восстановлены','Дані відновлено','Data restored'],
+['Начать учёт заново по паре','Почати облік заново за парою','Start over for pair'],['Начать учёт заново','Почати облік заново','Start over'],['Будут удалены сделки этой пары и её стартовый баланс','Будуть видалені угоди цієї пари та її стартовий баланс','This pair’s deals and its starting balance will be deleted'],['Остальные пары не затрагиваются','Інші пари не зачіпаються','Other pairs are not affected'],['Это нельзя отменить','Це неможливо скасувати','This cannot be undone'],
+['Подтвердить','Підтвердити','Confirm'],['Удалить эту сделку','Видалити цю угоду','Delete this deal'],['Удалить все сделки за','Видалити всі угоди за','Delete all deals for'],['Прибыль за этот день обнулится','Прибуток за цей день обнулиться','Profit for this day will be reset'],
+['П2П','P2P','P2P']
+];
+let TR=null;
+function tr(v){
+  if(LANG==='ru')return v;
+  if(!TR){const m={};I18N.forEach(a=>{if(!m[a[0]])m[a[0]]=a});const L='А-Яа-яЁёІіЇїЄєҐґ',ks=Object.keys(m).sort((a,b)=>b.length-a.length).map(k=>k.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'));TR={m,re:new RegExp('(^|[^'+L+'])('+ks.join('|')+')(?!['+L+'])','g')}}
+  const i=LANG==='uk'?1:2;return v.replace(TR.re,(_,p,k)=>p+TR.m[k][i]);
+}
+
 let ref=null,editId=null,span=7,tab='home',sub='days',flt='all',rps=7;
 const num=v=>{const n=parseFloat(String(v).replace(/\s/g,'').replace(',','.'));return isFinite(n)?n:0};
 const fm=(n,d=2)=>n.toLocaleString('ru-RU',{minimumFractionDigits:d,maximumFractionDigits:d});
@@ -323,7 +383,7 @@ function render(){
   const ra=rps?lim(rps-1):'',RT=c.T.filter(x=>(!ra||x.d>=ra)&&(x.t==='b'||x.t==='s'));
   let bB=0,bU=0,sS=0,sU=0,sG=0,p2=0,ds=0;RT.forEach(x=>{if(x.t==='b'){bB+=x.s;bU+=x.u;ds+=x.b?x.b-x.u:0}else{sS+=x.s;sU+=x.u;sG+=gr(x);p2+=c.pm[x.id]||0}});
   $('rp').value=`П2П-отчёт: ${RT.length?fd(RT[0].d)+' — '+fd(RT[RT.length-1].d):'нет сделок'}\nСделок: ${RT.length} (покупок ${RT.filter(x=>x.t==='b').length}, продаж ${RT.filter(x=>x.t==='s').length})\nКуплено: ${fu(bB)} USDT за ${fm(bU)} UAH`+(bB?` (ср. ${fm(bU/bB,4)})`:'')+`\nПродано: ${fu(sS)} USDT, получено ${fm(sU)} UAH`+(sS?` (курс ${fm(sG/sS,4)}, с комиссией ${fm(sU/sS,4)})`:'')+`\nКомиссия: ${fm(sG-sU)} UAH`+(ds?` · Скидки: ${fm(ds)} UAH`:'')+`\nПрибыль: ${sg(p2)} UAH`;
-  $('rp').value=$('rp').value.replace(/UAH/g,state.cur);
+  $('rp').value=tr($('rp').value).replace(/UAH/g,state.cur);
   const btn=x=>`<span><button class="ghost" data-edit="${x.id}">✎</button> <button class="ghost" data-id="${x.id}">×</button></span>`;
   const T=[...c.T].reverse().filter(x=>inR(x.d));
   $('trades').innerHTML=T.length?T.map(x=>{
@@ -487,10 +547,17 @@ $('pairs').innerHTML=CURS.map(c=>`<button type="button" data-cur="${c}" aria-lab
 $('pairs').onclick=e=>{const b=e.target.closest('[data-cur]');if(!b||b.dataset.cur===state.cur)return;state.cur=b.dataset.cur;stopEdit();render();save()};
 function curText(){
   const C0=state.cur,w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT,{acceptNode:n=>{const p=n.parentNode;return(p&&/^(SCRIPT|STYLE|TEXTAREA)$/.test(p.nodeName))||(p&&p.closest&&p.closest('#pairs'))?NodeFilter.FILTER_REJECT:NodeFilter.FILTER_ACCEPT}});
-  let n;while(n=w.nextNode()){if(n.__o===undefined)n.__o=n.nodeValue;const v=n.__o.replace(/UAH/g,C0);if(n.nodeValue!==v)n.nodeValue=v}
-  document.querySelectorAll('[placeholder]').forEach(e=>{if(e.dataset.o===undefined)e.dataset.o=e.placeholder;const v=e.dataset.o.replace(/UAH/g,C0);if(e.placeholder!==v)e.placeholder=v});
-  document.title='USDT/'+C0+' — учёт прибыли';
+  let n;while(n=w.nextNode()){if(n.__o===undefined)n.__o=n.nodeValue;const v=tr(n.__o).replace(/UAH/g,C0);if(n.nodeValue!==v)n.nodeValue=v}
+  document.querySelectorAll('[placeholder]').forEach(e=>{if(e.dataset.o===undefined)e.dataset.o=e.placeholder;const v=tr(e.dataset.o).replace(/UAH/g,C0);if(e.placeholder!==v)e.placeholder=v});
+  document.title='USDT/'+C0+' — '+tr('учёт прибыли');
 }
+const LN={uk:'Українська',ru:'Русский',en:'English'};
+$('lm').innerHTML=Object.entries(LN).map(([k,v])=>`<button type="button" data-l="${k}">${v}</button>`).join('');
+function markLang(){document.documentElement.lang=LANG;$('lng').textContent=LANG.toUpperCase();document.querySelectorAll('[data-l]').forEach(b=>b.classList.toggle('on',b.dataset.l===LANG))}
+$('lng').onclick=e=>{e.stopPropagation();$('lm').hidden=!$('lm').hidden};
+$('lm').onclick=e=>{const b=e.target.closest('[data-l]');if(!b)return;LANG=b.dataset.l;try{localStorage.setItem('p2p_lang',LANG)}catch(x){}markLang();render();curText()};
+document.addEventListener('click',()=>{$('lm').hidden=true});
+markLang();
 let cq=0;new MutationObserver(()=>{if(cq)return;cq=1;queueMicrotask(()=>{cq=0;curText()})}).observe(document.body,{childList:true,subtree:true,characterData:true});
 render();curText();
 setTimeout(()=>{const o=$('pairs').querySelector('.on');if(o)$('pairs').scrollLeft=Math.max(0,o.offsetLeft-60)},50);
@@ -530,8 +597,8 @@ btn.onclick=async()=>{
   p.setCustomParameters({prompt:'select_account'});
   try{await signInWithPopup(auth,p,browserPopupRedirectResolver)}
   catch(e){
-    if(e.code==='auth/popup-blocked')alert('Браузер заблокировал окно входа. Разрешите всплывающие окна для этого сайта и нажмите кнопку ещё раз.');
-    else if(e.code!=='auth/popup-closed-by-user'&&e.code!=='auth/cancelled-popup-request')alert('Не удалось войти: '+e.code);
+    if(e.code==='auth/popup-blocked')alert(window.tr('Браузер заблокировал окно входа. Разрешите всплывающие окна для этого сайта и нажмите кнопку ещё раз.'));
+    else if(e.code!=='auth/popup-closed-by-user'&&e.code!=='auth/cancelled-popup-request')alert(window.tr('Не удалось войти: '+e.code));
   }finally{busy=false;btn.disabled=false}
 };
 
