@@ -3,6 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/svg+xml" href="icon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="theme-color" content="#059669">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="P2P учёт">
+<link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://firestore.googleapis.com" crossorigin>
+<link rel="preconnect" href="https://identitytoolkit.googleapis.com" crossorigin>
+<style>.logo{width:22px;height:22px;border-radius:6px;vertical-align:-4px;margin-right:7px}.rem{display:flex;align-items:center;justify-content:space-between;gap:10px;background:color-mix(in srgb,var(--amber) 14%,var(--s1));border:1px solid color-mix(in srgb,var(--amber) 40%,var(--bd));border-radius:14px;padding:10px 12px;margin-bottom:12px;font-size:12px}</style>
 <title>USDT/UAH — учёт прибыли</title>
 <style>
 :root{--bg:#f3f6f5;--s1:#fff;--s2:#eef3f1;--bd:#dfe7e4;--tx:#0f1f1a;--mut:#5f706a;--pos:#059669;--neg:#e11d48;--blue:#2563eb;--amber:#b45309;--vio:#6d28d9;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
@@ -53,10 +65,43 @@ button.danger{background:transparent;color:var(--neg);border:1px solid var(--neg
 .nav button{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;background:transparent;color:var(--mut);padding:7px 2px;font-size:10px;font-weight:600;border-radius:16px}
 .nav button.on{color:var(--pos);background:color-mix(in srgb,var(--pos) 14%,transparent)}
 </style>
+<style>
+/* ===== Компьютер и широкие экраны ===== */
+@media (min-width:900px){
+  body{padding-left:240px}
+  main{max-width:1040px;margin:0 auto;padding:26px 28px 56px}
+  .top{padding:0 4px 20px}.top b{font-size:22px}.top span{font-size:12px}
+  .logo{width:28px;height:28px;border-radius:8px;vertical-align:-7px}
+  .nav{left:16px;right:auto;top:16px;bottom:16px;width:208px;flex-direction:column;justify-content:flex-start;gap:4px;padding:12px;border-radius:22px;box-shadow:none}
+  .nav::before{content:"P2P учёт";font-weight:800;font-size:15px;color:var(--tx);padding:8px 12px 14px}
+  .nav button{flex:none;flex-direction:row;justify-content:flex-start;gap:12px;font-size:14px;padding:11px 14px;border-radius:14px}
+  .nav button::after{content:attr(data-k);margin-left:auto;font-size:11px;font-weight:600;opacity:.55;border:1px solid var(--bd);border-radius:6px;padding:0 6px}
+  .g2{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+  .hero{padding:24px 28px}.hero #hp{font-size:52px}.hero .hs{font-size:13px}
+  .card{padding:20px}
+  .tile b{font-size:20px}
+  #t_add .card{max-width:860px}
+  #t_add .row{grid-template-columns:repeat(3,minmax(0,1fr))}
+  input,select,textarea,button{font-size:14px}
+  .rem{font-size:13px}
+  :focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+  ::-webkit-scrollbar{width:10px}::-webkit-scrollbar-thumb{background:var(--bd);border-radius:6px}
+}
+@media (min-width:900px) and (hover:hover){
+  button{transition:filter .15s,background .15s}
+  button:hover{filter:brightness(1.1)}
+  button.ghost:hover,.nav button:hover{background:var(--s2);filter:none}
+  .nav button:hover{color:var(--tx)}
+  .li:hover{background:color-mix(in srgb,var(--s2) 55%,transparent)}
+  summary:hover{color:var(--pos)}
+}
+@media (min-width:1500px){main{max-width:1180px}}
+</style>
 </head>
 <body>
 <main>
-<div class="top"><b>USDT / UAH</b><span id="st"></span><button class="ghost" id="auth" type="button" hidden>Войти через Google</button></div>
+<div class="rem" id="rem" hidden><span>Давно не делали резервную копию данных (вкладка «Ещё» → «Резервная копия»).</span><button class="ghost" id="rem_ok" type="button">Ок</button></div>
+<div class="top"><b><img class="logo" src="icon-192.png" alt="">USDT / UAH</b><span id="st"></span><button class="ghost" id="auth" type="button" hidden>Войти через Google</button></div>
 
 <section class="scr" id="t_home">
 <div class="hero"><span>Прибыль сегодня, UAH</span><b id="hp">0,00</b><div class="hs" id="hs"></div></div>
@@ -219,10 +264,22 @@ function render(){
   $('trades').innerHTML=T.length?T.map(x=>{const s=x.t==='s',r=s?gr(x)/x.s:(x.b||x.u)/x.s,ex=s?`<span class="ca">комиссия ${fm(gr(x)-x.u)}</span>`:x.b?`<span class="ca">скидка ${fm(x.b-x.u)}</span>`:'';
     return `<div class="li"><div class="l1"><span><span class="chip" style="--c:var(${s?'--pos':'--blue'})">${s?'Продажа':'Покупка'}</span> <b>${fd(x.d)}</b>${x.n?` <span class="mut">#${x.n}</span>`:''}</span><span><button class="ghost" data-edit="${x.id}">✎</button> <button class="ghost" data-id="${x.id}">×</button></span></div><div class="l2"><span><b style="color:var(--tx)">${fu(x.s)} USDT</b> ${s?'→':'←'} <b style="color:var(--tx)">${fm(x.u)} UAH</b></span><span>курс ${x.s?fm(r,4):'—'}</span><span>факт ${x.s?fm(x.u/x.s,4):'—'}</span>${ex}</div></div>`}).join(''):E;
 }
-async function save(){
+let _t=null;
+function save(){
   try{localStorage.setItem(LS,JSON.stringify(state))}catch(e){}
-  if(ref){try{await ref.set(state);$('st').textContent='· сохранено в аккаунте'}catch(e){$('st').textContent='· сохранено только в браузере'}}
+  if(!ref)return;
+  clearTimeout(_t);_t=setTimeout(push,700);
+  $('st').textContent='· сохраняется…';
 }
+function push(){
+  clearTimeout(_t);_t=null;
+  if(!ref)return;
+  const off=!navigator.onLine;
+  ref.set(state).then(()=>{$('st').textContent='· сохранено в аккаунте'}).catch(()=>{$('st').textContent='· сохранено только в браузере'});
+  if(off)$('st').textContent='· сохранено на устройстве, отправится при появлении сети';
+}
+document.addEventListener('visibilitychange',()=>{if(document.hidden&&_t)push()});
+addEventListener('pagehide',()=>{if(_t)push()});
 const msg=t=>{$('rt').textContent=t};
 function ask(m,fn){$('dm').textContent=m;$('dlg').hidden=false;$('dy').onclick=()=>{$('dlg').hidden=true;fn()};$('dn').onclick=()=>{$('dlg').hidden=true}}
 function labels(){
@@ -326,20 +383,59 @@ $('f_d').value=today();showTab('home');showSub('days');labels();
 try{const l=localStorage.getItem(LS);if(l)state=clean(JSON.parse(l))}catch(e){}
 $('st').textContent='· данные в браузере';
 render();
-window.cloudLoad=async function(r){
+let _unsub=null;
+window.cloudLoad=function(r){
+  if(_unsub){_unsub();_unsub=null}
   ref=r;
-  try{
-    const snap=await r.get();
-    if(snap.exists){state=clean(snap.data());render();$('st').textContent='· данные в аккаунте'}
-    else{await save()}
-  }catch(e){$('st').textContent='· ошибка облака, данные в браузере'}
+  _unsub=r.listen(snap=>{
+    if(snap.metadata.hasPendingWrites)return;
+    if(!snap.exists){
+      if(snap.metadata.fromCache)return; // в кэше пусто — ждём ответ сервера, ничего не затираем
+      if(state.trades.length||state.start.uah||state.start.usdt)save();
+      $('st').textContent='· данные в аккаунте';
+      return;
+    }
+    const n=clean(snap.data());
+    if(JSON.stringify(n)!==JSON.stringify(clean(state))){state=n;try{localStorage.setItem(LS,JSON.stringify(state))}catch(e){}render()}
+    $('st').textContent=snap.metadata.fromCache?'· из памяти устройства':'· данные в аккаунте';
+  },()=>{$('st').textContent='· ошибка облака, данные в браузере'});
 };
-window.cloudOff=function(){ref=null;$('st').textContent='· данные в браузере'};
+window.cloudOff=function(){if(_unsub){_unsub();_unsub=null}ref=null;$('st').textContent='· данные в браузере'};
+
+// напоминание о резервной копии раз в 7 дней
+(()=>{
+  const K='p2p_last_backup',day=864e5;
+  const get=()=>{try{return +localStorage.getItem(K)||0}catch(e){return 0}};
+  const set=()=>{try{localStorage.setItem(K,String(Date.now()))}catch(e){}$('rem').hidden=true};
+  if(!get())set();
+  else if(Date.now()-get()>7*day&&state.trades.length)$('rem').hidden=false;
+  $('rem_ok').onclick=set;
+  $('bk_show').addEventListener('click',set);
+  $('bk_copy').addEventListener('click',set);
+})();
+
+// горячие клавиши (компьютер): 1–5 вкладки, N новая сделка, Ctrl+Enter добавить, Esc закрыть окно
+(()=>{
+  const map={'1':'home','2':'add','3':'hist','4':'stat','5':'more'};
+  document.querySelectorAll('.nav [data-tab]').forEach((b,i)=>{b.dataset.k=i+1;b.title=b.textContent.trim()+' ('+(i+1)+')'});
+  addEventListener('keydown',e=>{
+    if(!$('dlg').hidden){if(e.key==='Escape')$('dn').click();return}
+    if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){
+      const b=document.querySelector('.scr:not([hidden]) .actions .ok');
+      if(b){e.preventDefault();b.click()}return;
+    }
+    const g=e.target,typing=/^(INPUT|TEXTAREA|SELECT)$/.test(g.tagName)||g.isContentEditable;
+    if(typing||e.ctrlKey||e.metaKey||e.altKey)return;
+    if(map[e.key]){e.preventDefault();showTab(map[e.key])}
+    else if(e.code==='KeyN'){e.preventDefault();showTab('add');setTimeout(()=>$('f_s').focus(),0)}
+  });
+})();
+if('serviceWorker' in navigator&&location.protocol.startsWith('http'))addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
 </script>
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-import {getAuth,GoogleAuthProvider,signInWithPopup,signInWithRedirect,getRedirectResult,signOut,onAuthStateChanged} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
-import {getFirestore,doc,getDoc,setDoc} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+import {initializeAuth,indexedDBLocalPersistence,browserLocalPersistence,browserPopupRedirectResolver,GoogleAuthProvider,signInWithPopup,signOut,onAuthStateChanged} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+import {initializeFirestore,persistentLocalCache,persistentMultipleTabManager,doc,onSnapshot,setDoc} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBpdM32vVZOwhfLPoql4EINmgh21bCGdSI",
@@ -351,41 +447,47 @@ const firebaseConfig = {
 };
 
 const btn=document.getElementById('auth');
-if(firebaseConfig.apiKey.startsWith("ВАШ")){
-  console.warn("Firebase не настроен — работает только localStorage");
-}else{
-  const app=initializeApp(firebaseConfig);
-  const auth=getAuth(app), db=getFirestore(app);
+const app=initializeApp(firebaseConfig);
+// Без popupRedirectResolver при старте: служебная страница Google не грузится, пока вы не нажмёте «Войти»
+const auth=initializeAuth(app,{persistence:[indexedDBLocalPersistence,browserLocalPersistence]});
+const db=initializeFirestore(app,{localCache:persistentLocalCache({tabManager:persistentMultipleTabManager()}),experimentalAutoDetectLongPolling:true});
+
+// Быстрая подсказка из прошлого визита, пока Firebase проверяет вход
+const hint=(()=>{try{return localStorage.getItem('p2p_user')}catch(e){return null}})();
+btn.hidden=false;
+if(hint){btn.textContent='Выйти ('+hint+')'}
+
+let busy=false;
+btn.onclick=async()=>{
+  if(busy)return;
+  if(auth.currentUser){await signOut(auth);return}
+  busy=true;btn.disabled=true;
+  const p=new GoogleAuthProvider();
+  p.setCustomParameters({prompt:'select_account'});
+  try{await signInWithPopup(auth,p,browserPopupRedirectResolver)}
+  catch(e){
+    if(e.code==='auth/popup-blocked')alert('Браузер заблокировал окно входа. Разрешите всплывающие окна для этого сайта и нажмите кнопку ещё раз.');
+    else if(e.code!=='auth/popup-closed-by-user'&&e.code!=='auth/cancelled-popup-request')alert('Не удалось войти: '+e.code);
+  }finally{busy=false;btn.disabled=false}
+};
+
+onAuthStateChanged(auth,u=>{
   btn.hidden=false;
-  let busy=false;
-  getRedirectResult(auth).catch(e=>{if(e&&e.code)alert('Не удалось войти: '+e.code)});
-  btn.onclick=async()=>{
-    if(busy)return;
-    if(auth.currentUser){await signOut(auth);return}
-    busy=true;btn.disabled=true;
-    const p=new GoogleAuthProvider();
-    p.setCustomParameters({prompt:'select_account'});
-    try{await signInWithPopup(auth,p)}
-    catch(e){
-      if(['auth/popup-blocked','auth/cancelled-popup-request','auth/operation-not-supported-in-this-environment'].includes(e.code)){
-        try{await signInWithRedirect(auth,p);return}catch(e2){alert('Не удалось войти: '+e2.code)}
-      }else if(e.code!=='auth/popup-closed-by-user'){alert('Не удалось войти: '+e.code)}
-    }finally{busy=false;btn.disabled=false}
-  };
-  onAuthStateChanged(auth,u=>{
-    if(u){
-      btn.textContent='Выйти ('+(u.displayName||u.email||'аккаунт')+')';
-      const d=doc(db,'users',u.uid);
-      window.cloudLoad({
-        get:async()=>{const s=await getDoc(d);return {exists:s.exists(),data:()=>s.data()}},
-        set:st=>setDoc(d,JSON.parse(JSON.stringify(st)))
-      });
-    }else{
-      btn.textContent='Войти через Google';
-      window.cloudOff();
-    }
-  });
-}
+  if(u){
+    const name=u.displayName||u.email||'аккаунт';
+    try{localStorage.setItem('p2p_user',name)}catch(e){}
+    btn.textContent='Выйти ('+name+')';
+    const d=doc(db,'users',u.uid);
+    window.cloudLoad({
+      listen:(ok,err)=>onSnapshot(d,{includeMetadataChanges:true},s=>ok({exists:s.exists(),data:()=>s.data(),metadata:s.metadata}),err),
+      set:st=>setDoc(d,JSON.parse(JSON.stringify(st)))
+    });
+  }else{
+    try{localStorage.removeItem('p2p_user')}catch(e){}
+    btn.textContent='Войти через Google';
+    window.cloudOff();
+  }
+});
 </script>
 </body>
 </html>
