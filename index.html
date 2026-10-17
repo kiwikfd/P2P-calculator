@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>USDT/UAH — учёт прибыли</title>
+<style>
+:root{--bg:#f3f6f5;--s1:#fff;--s2:#eef3f1;--bd:#dfe7e4;--tx:#0f1f1a;--mut:#5f706a;--pos:#059669;--neg:#e11d48;--blue:#2563eb;--amber:#b45309;--vio:#6d28d9;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#090d12;--s1:#111820;--s2:#18212b;--bd:#212d3a;--tx:#e8eef4;--mut:#8796a6;--pos:#34d399;--neg:#fb7185;--blue:#60a5fa;--amber:#fbbf24;--vio:#a78bfa;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#090d12;--s1:#111820;--s2:#18212b;--bd:#212d3a;--tx:#e8eef4;--mut:#8796a6;--pos:#34d399;--neg:#fb7185;--blue:#60a5fa;--amber:#fbbf24;--vio:#a78bfa;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}[hidden]{display:none!important}
+html,body{max-width:100%;overflow-x:hidden}
+body{margin:0;background:var(--bg);color:var(--tx);font:14px/1.4 -apple-system,Segoe UI,Roboto,Arial,sans-serif;font-variant-numeric:tabular-nums}
+main{max-width:640px;margin:0 auto;padding:12px 12px 100px}
+.top{display:flex;justify-content:space-between;align-items:baseline;padding:2px 4px 10px}.top b{font-size:17px}.top span{font-size:11px;color:var(--mut)}
+.hero{border-radius:22px;padding:16px;margin-bottom:12px;background:radial-gradient(120% 140% at 0% 0%,color-mix(in srgb,var(--pos) 24%,var(--s1)),var(--s1) 70%);border:1px solid color-mix(in srgb,var(--pos) 26%,var(--bd))}
+.hero>span{color:var(--mut);font-size:12px}.hero #hp{display:block;font-size:36px;font-weight:800;letter-spacing:-.5px;line-height:1.15;margin:2px 0 8px}
+.hs{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:12px;color:var(--mut)}.hs b{font-weight:700}
+.card{background:var(--s1);border:1px solid var(--bd);border-radius:18px;padding:14px;margin-bottom:12px}
+h2{font-size:14px;margin:0 0 10px}summary{font-weight:700;font-size:14px;cursor:pointer}details[open] summary{margin-bottom:10px}
+.g2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:12px}
+.tile{position:relative;overflow:hidden;background:var(--s1);border:1px solid var(--bd);border-radius:16px;padding:11px 12px 11px 14px}
+.tile::before{content:"";position:absolute;left:0;top:12px;bottom:12px;width:3px;border-radius:0 3px 3px 0;background:var(--c)}
+.tile span{display:block;color:var(--mut);font-size:11px}.tile b{display:block;font-size:18px;margin-top:2px;overflow-wrap:anywhere}
+.pos{color:var(--pos)}.neg{color:var(--neg)}
+label{display:block;font-size:11px;color:var(--mut);margin-bottom:3px}
+input,select,textarea{display:block;width:100%;min-width:0;max-width:100%;padding:10px 11px;border:1px solid var(--bd);border-radius:12px;background:var(--s2);color:var(--tx);font:inherit;font-size:16px}
+input[type=date]{-webkit-appearance:none;appearance:none;min-height:43px;text-align:left;overflow:hidden}
+input[type=date]::-webkit-date-and-time-value{text-align:left}
+textarea{min-height:48px;resize:none}
+button{padding:11px 14px;border:0;border-radius:12px;background:#059669;color:#fff;font:inherit;font-weight:700;cursor:pointer}
+button.pu{background:#6d28d9}
+button.ghost{background:transparent;color:var(--mut);padding:4px 10px;font-weight:500;border:1px solid var(--bd);border-radius:10px}
+button.danger{background:transparent;color:var(--neg);border:1px solid var(--neg)}
+.row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;align-items:end}.row>*{min-width:0}.full{grid-column:1/-1}
+.seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:4px;background:var(--s2);padding:4px;border-radius:14px;margin-bottom:12px}
+.seg button{background:transparent;color:var(--mut);padding:8px 4px;border-radius:11px;font-weight:600;font-size:13px}
+.seg button.on{background:color-mix(in srgb,var(--pos) 18%,transparent);color:var(--pos)}
+.seg button.on[data-t=b]{background:color-mix(in srgb,var(--blue) 20%,transparent);color:var(--blue)}
+.head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px}.head h2{margin:0}
+.pst{display:flex;gap:8px;margin-bottom:10px}.pst textarea{flex:1}
+.actions{display:flex;gap:8px;margin-top:12px}.actions .ok{flex:1}
+.li{padding:9px 0;border-bottom:1px solid var(--bd)}.li:last-child{border-bottom:0}
+.l1{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.l2{display:flex;flex-wrap:wrap;align-items:center;gap:2px 10px;font-size:12px;color:var(--mut);margin-top:4px}
+.mb{height:4px;background:var(--s2);border-radius:2px;margin-top:6px;overflow:hidden}.mb i{display:block;height:100%}
+.chip{display:inline-block;padding:1px 9px;border-radius:99px;font-size:11px;font-weight:700;color:var(--c);background:color-mix(in srgb,var(--c) 16%,transparent)}
+.cb{color:var(--blue)}.cg{color:var(--pos)}.ca{color:var(--amber)}.mut{color:var(--mut)}
+.prog{height:8px;background:var(--s2);border-radius:4px;overflow:hidden}.prog i{display:block;height:100%;background:linear-gradient(90deg,var(--blue),var(--pos))}
+.hint{font-size:12px;color:var(--mut);margin:8px 0 0}.empty{text-align:center;color:var(--mut);padding:14px}
+.nav{position:fixed;left:10px;right:10px;bottom:calc(10px + env(safe-area-inset-bottom,0px));display:flex;gap:2px;padding:6px;background:color-mix(in srgb,var(--s1) 92%,transparent);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border:1px solid var(--bd);border-radius:22px;box-shadow:0 8px 28px rgba(0,0,0,.28);z-index:10}
+.nav button{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;background:transparent;color:var(--mut);padding:7px 2px;font-size:10px;font-weight:600;border-radius:16px}
+.nav button.on{color:var(--pos);background:color-mix(in srgb,var(--pos) 14%,transparent)}
+</style>
+</head>
+<body>
+<main>
+<div class="top"><b>USDT / UAH</b><span id="st"></span><button class="ghost" id="auth" type="button" hidden>Войти через Google</button></div>
+
+<section class="scr" id="t_home">
+<div class="hero"><span>Прибыль сегодня, UAH</span><b id="hp">0,00</b><div class="hs" id="hs"></div></div>
+<div class="g2" id="hstats"></div>
+<div class="card"><div class="head"><h2>Цель на день</h2><span class="mut" id="goalTxt"></span></div><div class="prog"><i id="goalBar" style="width:0"></i></div></div>
+<div class="card"><div class="head"><h2>Прибыль по дням</h2><div class="seg" style="margin:0;width:130px"><button class="on" data-span="7">7 дн.</button><button data-span="30">30 дн.</button></div></div><div id="chart"></div><p class="hint" id="chartInfo"></p></div>
+</section>
+
+<section class="scr" id="t_add" hidden>
+<div class="card">
+<div class="seg"><button data-t="b" class="on">Покупка</button><button data-t="s">Продажа</button></div>
+<select id="f_t" hidden><option value="b">Покупка</option><option value="s">Продажа</option></select>
+<div class="pst"><textarea id="paste" placeholder="Вставьте сообщение сделки из бота — заполню сам"></textarea><button class="pu" id="parse">Разобрать</button></div>
+<div class="row">
+<div><label id="l_s">USDT получено</label><input id="f_s" inputmode="decimal" placeholder="0"></div>
+<div><label>Курс из бота</label><input id="f_r" inputmode="decimal" placeholder="UAH за 1 USDT"></div>
+<div><label id="l_u">UAH потрачено</label><input id="f_u" inputmode="decimal" placeholder="0"></div>
+<div id="dw"><label>Была скидка?</label><select id="f_dc"><option value="n">Нет</option><option value="y">Да</option></select></div>
+<div id="fw" hidden><label>Комиссия продажи, %</label><input id="f_f" inputmode="decimal" value="1"></div>
+<div id="pw" class="full" hidden><label>Заплатил по факту, UAH</label><input id="f_p" inputmode="decimal" placeholder="0"></div>
+<div><label>Дата</label><input type="date" id="f_d"></div>
+<div><label>№ сделки</label><input id="f_n" placeholder="D40185486"></div>
+</div>
+<div class="actions"><button class="ok" id="add">Добавить</button><button id="cancel" class="ghost" hidden>Отмена</button></div>
+<p class="hint" id="rt">Курс: —</p>
+<p class="hint"><button class="ghost" id="again">Повторить прошлую сделку</button></p>
+</div>
+</section>
+
+<section class="scr" id="t_hist" hidden>
+<div class="seg"><button class="on" data-flt="all">Всё</button><button data-flt="today">Сегодня</button><button data-flt="7">7 дн.</button><button data-flt="30">30 дн.</button></div>
+<div class="card" id="trades"></div>
+</section>
+
+<section class="scr" id="t_stat" hidden>
+<div class="seg"><button class="on" data-sub="days">Дни</button><button data-sub="months">Месяцы</button><button data-sub="rates">Курсы</button></div>
+<div class="card" id="sb_days"><div id="days"></div></div>
+<div class="card" id="sb_months" hidden><div id="months"></div></div>
+<div class="g2" id="sb_rates" hidden></div>
+</section>
+
+<section class="scr" id="t_more" hidden>
+<div class="card"><h2>Стартовый баланс</h2>
+<div class="row">
+<div><label>UAH на картах</label><input id="s_uah" inputmode="decimal" placeholder="0"></div>
+<div><label>USDT на балансе</label><input id="s_usdt" inputmode="decimal" placeholder="0"></div>
+<div class="full"><label>Курс этих USDT (необязательно)</label><input id="s_rate" inputmode="decimal" placeholder="по ср. курсу покупок"></div>
+<div class="full"><button id="saveStart" style="width:100%">Сохранить</button></div>
+</div>
+<p class="hint">Курс нужен, чтобы посчитать прибыль с продажи стартовых USDT. Если пусто — берётся средний курс ваших покупок.</p>
+</div>
+<div class="card"><h2>Цели</h2>
+<div class="row">
+<div><label>Цель на день, UAH</label><input id="g_g" inputmode="decimal" placeholder="0"></div>
+<div><label>Желаемая прибыль, %</label><input id="g_p" inputmode="decimal"></div>
+</div>
+</div>
+<details class="card"><summary>Данные и копия</summary>
+<p class="hint" style="margin:0 0 8px">Данные и так сохраняются в вашем аккаунте сами. Копия нужна только чтобы перенести их или вернуть, если вдруг пропадут.</p>
+<textarea id="bk" placeholder="Здесь появится текст копии. Для восстановления вставьте его сюда."></textarea>
+<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px"><button id="bk_show">Показать</button><button class="ghost" id="bk_copy">Скопировать</button><button class="ghost" id="bk_load">Восстановить</button></div>
+<p class="hint" id="bk_msg"></p>
+</details>
+<button id="reset" class="danger" style="width:100%">Начать учёт заново</button>
+</section>
+
+<nav class="nav">
+<button class="on" data-tab="home"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></svg>Главная</button>
+<button data-tab="add"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>Сделка</button>
+<button data-tab="hist"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01"/></svg>Сделки</button>
+<button data-tab="stat"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 20v-7M12 20V5M19 20V9"/></svg>Итоги</button>
+<button data-tab="more"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg>Ещё</button>
+</nav>
+</main>
+
+<div id="dlg" hidden style="position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;padding:16px;z-index:20"><div class="card" style="max-width:380px;margin:0"><p id="dm" style="margin-top:0"></p><div style="display:flex;gap:8px;justify-content:flex-end"><button id="dn" class="ghost">Отмена</button><button id="dy" class="danger">Подтвердить</button></div></div></div>
+
+<script>
+const $=id=>document.getElementById(id);
+const LS='usdt_uah_tracker_v1';
+let state={start:{uah:0,usdt:0,rate:0},fee:1,goal:0,tp:1,trades:[]};
+let ref=null,editId=null,span=7,tab='home',sub='days',flt='all';
+const num=v=>{const n=parseFloat(String(v).replace(/\s/g,'').replace(',','.'));return isFinite(n)?n:0};
+const fm=(n,d=2)=>n.toLocaleString('ru-RU',{minimumFractionDigits:d,maximumFractionDigits:d});
+const fu=n=>n.toLocaleString('ru-RU',{minimumFractionDigits:2,maximumFractionDigits:6});
+const fd=s=>s.split('-').reverse().join('.');
+const iso=d=>d.toLocaleDateString('sv-SE');
+const today=()=>iso(new Date());
+const cls=n=>n>0.005?'pos':n<-0.005?'neg':'';
+const sg=n=>(n>0.005?'+':'')+fm(n);
+const fe=x=>x.t==='s'?(x.f==null?state.fee:x.f):0;
+const gr=x=>{const f=fe(x)/100;return f<1?x.u/(1-f):x.u};
+const MN=['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
+const MG=['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
+
+function clean(s){
+  const o={start:{uah:num(s?.start?.uah),usdt:num(s?.start?.usdt),rate:num(s?.start?.rate)},fee:s?.fee==null?1:num(s.fee),goal:num(s?.goal),tp:s?.tp==null?1:num(s.tp),trades:[]};
+  (Array.isArray(s?.trades)?s.trades:[]).forEach(x=>{
+    if(/^\d{4}-\d{2}-\d{2}$/.test(x?.d)&&(x.t==='b'||x.t==='s'))o.trades.push({id:num(x.id),d:x.d,t:x.t,u:num(x.u),s:num(x.s),f:x.f==null?null:num(x.f),b:x.b==null?null:num(x.b),n:/^D\d+$/.test(x.n)?x.n:''});
+  });
+  return o;
+}
+function calc(){
+  const S=state.start,T=[...state.trades].sort((a,b)=>a.d.localeCompare(b.d)||a.id-b.id);
+  let bu=0,bs=0,su=0,ss=0,sgr=0,fee=0,disc=0;
+  T.forEach(x=>{if(x.t==='b'){bu+=x.u;bs+=x.s;disc+=x.b?x.b-x.u:0}else{su+=x.u;ss+=x.s;sgr+=gr(x)}});
+  let invS=S.usdt,invC=S.usdt*(S.rate||(bs?bu/bs:0));
+  let uah=S.uah,usdt=S.usdt,total=0;const days={};
+  T.forEach(x=>{
+    const d=days[x.d]||(days[x.d]={d:x.d,bs:0,bu:0,ss:0,su:0,p:0,fc:0,dc:0});
+    if(x.t==='b'){d.bs+=x.s;d.bu+=x.u;d.dc+=x.b?x.b-x.u:0;invS+=x.s;invC+=x.u;uah-=x.u;usdt+=x.s}
+    else{
+      const avg=invS>0?invC/invS:0,p=x.u-x.s*avg;
+      d.p+=p;total+=p;d.ss+=x.s;d.su+=x.u;uah+=x.u;usdt-=x.s;
+      const fc=gr(x)-x.u;d.fc+=fc;fee+=fc;
+      invS=Math.max(0,invS-x.s);invC=Math.max(0,invC-x.s*avg);
+    }
+  });
+  const D=Object.values(days);let cum=0;D.forEach(d=>{cum+=d.p;d.c=cum});
+  const ago=n=>{const z=new Date();z.setDate(z.getDate()-n);return iso(z)};
+  const sum=f=>D.filter(d=>d.d>=f).reduce((a,d)=>a+d.p,0);
+  return{days:D,total,uah,usdt,fee,disc,T,avg:invS>0?invC/invS:0,p7:sum(ago(6)),p30:sum(ago(29)),
+    buyRate:bs?bu/bs:0,sellRate:ss?sgr/ss:0,netRate:ss?su/ss:0};
+}
+function chart(c){
+  const m={};c.days.forEach(d=>m[d.d]=d.p);const a=[];
+  for(let i=span-1;i>=0;i--){const z=new Date();z.setDate(z.getDate()-i);const k=iso(z);a.push([k,m[k]||0])}
+  const mx=Math.max(0,...a.map(v=>v[1])),mn=Math.min(0,...a.map(v=>v[1])),rg=(mx-mn)||1,W=300,H=90,bw=W/span;
+  const y=v=>H-(v-mn)/rg*H,z0=y(0);
+  $('chart').innerHTML=`<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" style="width:100%;height:110px">`+a.map((v,i)=>{const yy=y(v[1]);return `<rect x="${i*bw+1}" y="${Math.min(yy,z0)}" width="${bw-2}" height="${Math.max(Math.abs(yy-z0),v[1]?1:0)}" style="fill:var(${v[1]<0?'--neg':'--pos'})"/>`}).join('')+`<line x1="0" x2="${W}" y1="${z0}" y2="${z0}" stroke="var(--bd)"/></svg>`;
+  $('chartInfo').textContent=fd(a[0][0])+' — '+fd(a[span-1][0])+' · лучший день: '+sg(mx)+(mn<0?', худший: '+sg(mn):'');
+}
+function render(){
+  const c=calc(),t=today(),td=c.days.find(d=>d.d===t),tp=td?td.p:0;
+  const sp=c.buyRate&&c.netRate?c.netRate-c.buyRate:0;
+  $('s_uah').value=state.start.uah||'';$('s_usdt').value=state.start.usdt||'';$('s_rate').value=state.start.rate||'';
+  if(document.activeElement!==$('f_f'))$('f_f').value=state.fee;
+  if(document.activeElement!==$('g_g'))$('g_g').value=state.goal||'';
+  if(document.activeElement!==$('g_p'))$('g_p').value=state.tp;
+  $('hp').textContent=sg(tp);$('hp').className=cls(tp);
+  const hv=(l,v)=>`<span>${l} <b class="${cls(v)}">${sg(v)}</b></span>`;
+  $('hs').innerHTML=hv('7 дн.',c.p7)+hv('30 дн.',c.p30)+hv('всего',c.total);
+  const tile=(l,v,k,col)=>`<div class="tile" style="--c:var(--${col})"><span>${l}</span><b class="${k}">${v}</b></div>`;
+  const fe1=state.fee/100,ok=c.avg&&fe1<1,be=ok?c.avg/(1-fe1):0,tg=ok?c.avg*(1+state.tp/100)/(1-fe1):0;
+  $('hstats').innerHTML=tile('UAH на картах',fm(c.uah),'','blue')+tile('USDT на балансе',fu(c.usdt),'','blue')+tile('Безубыточный курс',be?fm(be,4):'—','','amber')+tile('Курс для +'+state.tp+'%',tg?fm(tg,4):'—','','amber');
+  const g=state.goal;
+  $('goalBar').style.width=(g>0?Math.max(0,Math.min(100,tp/g*100)):0)+'%';
+  $('goalTxt').textContent=g>0?`${sg(tp)} из ${fm(g)} UAH · ${Math.round(tp/g*100)}%`:'не задана (вкладка «Ещё»)';
+  chart(c);
+  $('sb_rates').innerHTML=tile('Ср. курс покупки',c.buyRate?fm(c.buyRate,4):'—','','blue')+tile('Ср. курс продажи',c.sellRate?fm(c.sellRate,4):'—','','pos')+tile('Продажа с комиссией',c.netRate?fm(c.netRate,4):'—','','pos')+tile('Спред с комиссией',sp?fm(sp,4):'—',cls(sp),'vio')+
+    tile('Ср. себестоимость остатка',c.avg?fm(c.avg,4):'—','','vio')+tile('Комиссия всего, UAH',fm(c.fee),'','amber')+tile('Скидки всего, UAH',fm(c.disc),'','amber');
+  const lim=n=>{const z=new Date();z.setDate(z.getDate()-n);return iso(z)};
+  const fa=flt==='today'?t:flt==='7'?lim(6):flt==='30'?lim(29):'',inR=d=>!fa||d>=fa,E='<div class="empty">Нет сделок</div>';
+  const D=[...c.days].reverse(),mx=Math.max(1,...D.map(d=>Math.abs(d.p)));
+  $('days').innerHTML=D.length?D.map(d=>`<div class="li"><div class="l1"><b>${fd(d.d)}</b><b class="${cls(d.p)}">${sg(d.p)} UAH</b></div><div class="mb"><i style="width:${Math.round(Math.abs(d.p)/mx*100)}%;background:var(${d.p<0?'--neg':'--pos'})"></i></div><div class="l2">${d.bs?`<span class="cb">Куплено ${fu(d.bs)} USDT · ${fm(d.bu)} UAH</span>`:''}${d.ss?`<span class="cg">Продано ${fu(d.ss)} USDT · ${fm(d.su)} UAH</span>`:''}${d.fc?`<span class="ca">Комиссия ${fm(d.fc)}</span>`:''}${d.dc?`<span class="ca">Скидка ${fm(d.dc)}</span>`:''}<span>Всего ${sg(d.c)}</span><button class="ghost" style="margin-left:auto" data-day="${d.d}">очистить</button></div></div>`).join(''):E;
+  const M={};c.days.forEach(d=>{const k=d.d.slice(0,7),m=M[k]||(M[k]={p:0,fc:0,dc:0,ss:0});m.p+=d.p;m.fc+=d.fc;m.dc+=d.dc;m.ss+=d.ss});
+  const ks=Object.keys(M).sort().reverse();
+  $('months').innerHTML=ks.length?ks.map(k=>{const m=M[k];return `<div class="li"><div class="l1"><b>${MN[+k.slice(5)-1]} ${k.slice(0,4)}</b><b class="${cls(m.p)}">${sg(m.p)} UAH</b></div><div class="l2"><span class="cg">Продано ${fu(m.ss)} USDT</span>${m.fc?`<span class="ca">Комиссия ${fm(m.fc)}</span>`:''}${m.dc?`<span class="ca">Скидка ${fm(m.dc)}</span>`:''}</div></div>`}).join(''):E;
+  const T=[...c.T].reverse().filter(x=>inR(x.d));
+  $('trades').innerHTML=T.length?T.map(x=>{const s=x.t==='s',r=s?gr(x)/x.s:(x.b||x.u)/x.s,ex=s?`<span class="ca">комиссия ${fm(gr(x)-x.u)}</span>`:x.b?`<span class="ca">скидка ${fm(x.b-x.u)}</span>`:'';
+    return `<div class="li"><div class="l1"><span><span class="chip" style="--c:var(${s?'--pos':'--blue'})">${s?'Продажа':'Покупка'}</span> <b>${fd(x.d)}</b>${x.n?` <span class="mut">#${x.n}</span>`:''}</span><span><button class="ghost" data-edit="${x.id}">✎</button> <button class="ghost" data-id="${x.id}">×</button></span></div><div class="l2"><span><b style="color:var(--tx)">${fu(x.s)} USDT</b> ${s?'→':'←'} <b style="color:var(--tx)">${fm(x.u)} UAH</b></span><span>курс ${x.s?fm(r,4):'—'}</span><span>факт ${x.s?fm(x.u/x.s,4):'—'}</span>${ex}</div></div>`}).join(''):E;
+}
+async function save(){
+  try{localStorage.setItem(LS,JSON.stringify(state))}catch(e){}
+  if(ref){try{await ref.set(state);$('st').textContent='· сохранено в аккаунте'}catch(e){$('st').textContent='· сохранено только в браузере'}}
+}
+const msg=t=>{$('rt').textContent=t};
+function ask(m,fn){$('dm').textContent=m;$('dlg').hidden=false;$('dy').onclick=()=>{$('dlg').hidden=true;fn()};$('dn').onclick=()=>{$('dlg').hidden=true}}
+function labels(){
+  const b=$('f_t').value==='b',dc=$('f_dc').value==='y';
+  $('l_u').textContent=b?'UAH по сделке (Платите)':'UAH получено (после комиссии)';
+  $('l_s').textContent=b?'USDT получено':'USDT продано';
+  document.querySelectorAll('[data-t]').forEach(x=>x.classList.toggle('on',x.dataset.t===$('f_t').value));$('fw').hidden=b;$('dw').hidden=!b;$('pw').hidden=!(b&&dc);
+  const u=num($('f_u').value),s=num($('f_s').value),f=b?0:num($('f_f').value)/100,g=f<1?u/(1-f):u;
+  let t;
+  if(!(u&&s))t='Курс: —';
+  else if(b){t='Курс покупки: '+fm(u/s,4);const p=num($('f_p').value);if(dc&&p)t+=' · факт: '+fm(p/s,4)+' · скидка: '+fm(u-p)+' UAH'}
+  else t='Курс продажи: '+fm(g/s,4)+' · с комиссией: '+fm(u/s,4)+' · комиссия: '+fm(g-u)+' UAH';
+  msg(t);
+}
+function fromRate(){
+  const s=num($('f_s').value),r=num($('f_r').value);
+  if(s&&r){const f=$('f_t').value==='s'?num($('f_f').value)/100:0;$('f_u').value=+(s*r*(1-f)).toFixed(2)}
+  labels();
+}
+function stopEdit(){
+  editId=null;['f_u','f_s','f_r','f_p','f_n'].forEach(i=>$(i).value='');$('f_dc').value='n';
+  $('add').textContent='Добавить';$('cancel').hidden=true;labels();
+}
+function startEdit(id){
+  const x=state.trades.find(t=>t.id===id);if(!x)return;
+  editId=id;$('f_d').value=x.d;$('f_t').value=x.t;$('f_s').value=x.s;$('f_r').value='';$('f_n').value=x.n;
+  $('f_u').value=x.b||x.u;$('f_dc').value=x.b?'y':'n';$('f_p').value=x.b?x.u:'';
+  if(x.t==='s')$('f_f').value=x.f==null?state.fee:x.f;
+  $('add').textContent='Сохранить изменения';$('cancel').hidden=false;labels();
+  showTab('add');
+}
+function parseDeal(t){
+  const buy=/Покупаете/i.test(t),sell=/Прода[её]те/i.test(t);
+  if(!buy&&!sell)return null;
+  const g=r=>{const m=t.match(r);return m?num(m[1].replace(/,/g,'')):0};
+  const dm=t.match(/завершена\s+(\d{1,2})\s+([а-яё]+)\s+(\d{4})/i),mo=dm?MG.indexOf(dm[2].toLowerCase()):-1;
+  return{t:buy?'b':'s',n:(t.match(/#(D\d+)/)||[])[1]||'',r:g(/Цена за[^:]*:[^\d]*([\d.,]+)/i),
+    s:g(/(?:Покупаете|Прода[её]те):[^\d]*([\d.,]+)\s*USDT/i),u:g(/(?:Платите|Получаете):[^\d]*([\d.,]+)\s*UAH/i),
+    d:mo>=0?`${dm[3]}-${String(mo+1).padStart(2,'0')}-${String(dm[1]).padStart(2,'0')}`:''};
+}
+$('parse').onclick=()=>{
+  const raw=$('paste').value;if(!raw.trim()){msg('Сначала вставьте текст сделки из бота');return}
+  const r=parseDeal(raw);
+  if(!r||!r.s||!r.u){msg('Не удалось разобрать текст. Скопируйте сообщение сделки из бота целиком.');return}
+  stopEdit();
+  $('f_t').value=r.t;$('f_s').value=r.s;$('f_u').value=r.u;$('f_n').value=r.n;$('f_r').value=r.r||'';if(r.d)$('f_d').value=r.d;
+  $('paste').value='';labels();
+  const dup=r.n&&state.trades.some(x=>x.n===r.n);
+  msg((dup?'Сделка #'+r.n+' уже внесена ранее! ':'')+'Распознано: '+(r.t==='b'?'покупка':'продажа')+', '+r.s+' USDT, '+r.u+' UAH'+(r.r?', курс '+r.r:'')+(r.n?', #'+r.n:'')+(r.d?'':', дата не найдена — стоит выбранная')+'. Проверьте и нажмите «Добавить».'+(r.t==='b'?' Если была скидка — выберите «Да».':''));
+};
+$('again').onclick=()=>{
+  const x=[...state.trades].sort((a,b)=>b.id-a.id)[0];if(!x)return;
+  stopEdit();$('f_d').value=today();$('f_t').value=x.t;$('f_s').value=x.s;$('f_u').value=x.b||x.u;labels();
+};
+$('paste').addEventListener('paste',()=>setTimeout(()=>$('parse').click(),60));
+$('f_t').onchange=fromRate;$('f_s').oninput=fromRate;$('f_r').oninput=fromRate;$('f_f').oninput=fromRate;
+$('f_u').oninput=labels;$('f_dc').onchange=labels;$('f_p').oninput=labels;
+$('add').onclick=()=>{
+  const d=$('f_d').value,t=$('f_t').value,s=num($('f_s').value),bill=num($('f_u').value),dc=t==='b'&&$('f_dc').value==='y';
+  const u=dc?num($('f_p').value):bill,n=$('f_n').value.trim().replace(/^#/,'').toUpperCase();
+  if(!d||s<=0||u<=0||bill<=0){msg('Заполните дату, USDT и суммы UAH (больше нуля)');return}
+  if(n&&state.trades.some(x=>x.n===n&&x.id!==editId)){msg('Сделка #'+n+' уже внесена');return}
+  const f=t==='s'?num($('f_f').value):0,tr={id:editId||Date.now(),d,t,u,s,f,b:dc?bill:null,n:/^D\d+$/.test(n)?n:''};
+  if(t==='s')state.fee=f;
+  if(editId)state.trades=state.trades.map(x=>x.id===editId?tr:x);else state.trades.push(tr);
+  const was=editId;stopEdit();render();save();msg(was?'Изменения сохранены ✓':'Сделка добавлена ✓');if(was)showTab('hist');
+};
+$('cancel').onclick=()=>{stopEdit();showTab('hist')};
+$('saveStart').onclick=()=>{state.start={uah:num($('s_uah').value),usdt:num($('s_usdt').value),rate:num($('s_rate').value)};render();save()};
+$('g_g').onchange=()=>{state.goal=num($('g_g').value);render();save()};
+function showTab(t){tab=t;document.querySelectorAll('.scr').forEach(s=>s.hidden=s.id!=='t_'+t);document.querySelectorAll('[data-tab]').forEach(b=>b.classList.toggle('on',b.dataset.tab===t));window.scrollTo(0,0)}
+function showSub(s){sub=s;['days','months','rates'].forEach(k=>$('sb_'+k).hidden=k!==s);document.querySelectorAll('[data-sub]').forEach(b=>b.classList.toggle('on',b.dataset.sub===s))}
+function showFlt(f){flt=f;document.querySelectorAll('[data-flt]').forEach(b=>b.classList.toggle('on',b.dataset.flt===f));render()}
+document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>showTab(b.dataset.tab));
+document.querySelectorAll('[data-sub]').forEach(b=>b.onclick=()=>showSub(b.dataset.sub));
+document.querySelectorAll('[data-flt]').forEach(b=>b.onclick=()=>showFlt(b.dataset.flt));
+document.querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>{$('f_t').value=b.dataset.t;fromRate()});
+$('g_p').onchange=()=>{state.tp=num($('g_p').value);render();save()};
+document.querySelectorAll('[data-span]').forEach(b=>b.onclick=()=>{span=+b.dataset.span;document.querySelectorAll('[data-span]').forEach(x=>x.classList.toggle('on',x===b));render()});
+$('trades').onclick=e=>{
+  const ds=e.target.dataset||{};
+  if(ds.edit){startEdit(Number(ds.edit));return}
+  if(ds.id)ask('Удалить эту сделку?',()=>{state.trades=state.trades.filter(x=>String(x.id)!==ds.id);if(String(editId)===ds.id)stopEdit();render();save()});
+};
+$('days').onclick=e=>{
+  const d=e.target.dataset&&e.target.dataset.day;
+  if(d)ask('Удалить все сделки за '+fd(d)+'? Прибыль за этот день обнулится.',()=>{state.trades=state.trades.filter(x=>x.d!==d);stopEdit();render();save()});
+};
+$('reset').onclick=()=>ask('Начать учёт заново? Будут удалены ВСЕ сделки и стартовый баланс. Это нельзя отменить.',()=>{state={start:{uah:0,usdt:0,rate:0},fee:state.fee,goal:state.goal,tp:state.tp,trades:[]};stopEdit();render();save()});
+$('bk_show').onclick=()=>{$('bk').value=JSON.stringify(state);$('bk_msg').textContent='Скопируйте этот текст и сохраните в заметках.'};
+$('bk_copy').onclick=async()=>{
+  if(!$('bk').value)$('bk').value=JSON.stringify(state);
+  try{await navigator.clipboard.writeText($('bk').value);$('bk_msg').textContent='Скопировано.'}
+  catch(e){$('bk').select();$('bk_msg').textContent='Текст выделен — скопируйте вручную.'}
+};
+$('bk_load').onclick=()=>{
+  let o;try{o=clean(JSON.parse($('bk').value))}catch(e){$('bk_msg').textContent='Текст копии не распознан.';return}
+  ask('Заменить текущие данные данными из копии ('+o.trades.length+' сделок)?',()=>{state=o;stopEdit();render();save();$('bk').value='';$('bk_msg').textContent='Данные восстановлены.'});
+};
+$('f_d').value=today();showTab('home');showSub('days');labels();
+try{const l=localStorage.getItem(LS);if(l)state=clean(JSON.parse(l))}catch(e){}
+$('st').textContent='· данные в браузере';
+render();
+window.cloudLoad=async function(r){
+  ref=r;
+  try{
+    const snap=await r.get();
+    if(snap.exists){state=clean(snap.data());render();$('st').textContent='· данные в аккаунте'}
+    else{await save()}
+  }catch(e){$('st').textContent='· ошибка облака, данные в браузере'}
+};
+window.cloudOff=function(){ref=null;$('st').textContent='· данные в браузере'};
+</script>
+<script type="module">
+import {initializeApp} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+import {getAuth,GoogleAuthProvider,signInWithPopup,signOut,onAuthStateChanged} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+import {getFirestore,doc,getDoc,setDoc} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBpdM32vVZOwhfLPoql4EINmgh21bCGdSI",
+  authDomain: "p2p-calc-cb.firebaseapp.com",
+  projectId: "p2p-calc-cb",
+  storageBucket: "p2p-calc-cb.firebasestorage.app",
+  messagingSenderId: "663128729226",
+  appId: "1:663128729226:web:3b6db292df6cfd91892f73"
+};
+
+const btn=document.getElementById('auth');
+if(firebaseConfig.apiKey.startsWith("ВАШ")){
+  console.warn("Firebase не настроен — работает только localStorage");
+}else{
+  const app=initializeApp(firebaseConfig);
+  const auth=getAuth(app), db=getFirestore(app);
+  btn.hidden=false;
+  btn.onclick=()=>auth.currentUser
+    ? signOut(auth)
+    : signInWithPopup(auth,new GoogleAuthProvider()).catch(e=>alert('Не удалось войти: '+e.code));
+  onAuthStateChanged(auth,u=>{
+    if(u){
+      btn.textContent='Выйти ('+(u.displayName||u.email||'аккаунт')+')';
+      const d=doc(db,'users',u.uid);
+      window.cloudLoad({
+        get:async()=>{const s=await getDoc(d);return {exists:s.exists(),data:()=>s.data()}},
+        set:st=>setDoc(d,JSON.parse(JSON.stringify(st)))
+      });
+    }else{
+      btn.textContent='Войти через Google';
+      window.cloudOff();
+    }
+  });
+}
+</script>
+</body>
+</html>
