@@ -268,7 +268,8 @@ input,select,textarea{transition:box-shadow .25s,border-color .25s,background-co
 .prog i{transition:width .9s var(--out),background-color .3s}
 .tgl{transition:background-color .28s}.tgl::after{transition:transform .38s var(--spring)}
 /* «капля» стекла плавно переезжает между пунктами */
-.has-thumb{position:relative}
+.has-thumb:not(.nav){position:relative}
+.nav.has-thumb{position:fixed}
 .has-thumb>button{position:relative;z-index:1}
 .gthumb{position:absolute;left:0;top:0;z-index:0;width:0;height:0;opacity:0;border-radius:999px;background:var(--thumb);box-shadow:0 2px 10px rgba(0,0,0,.14),inset 0 1px 0 var(--gh);pointer-events:none}
 .gthumb.ready{transition:transform .5s var(--spring),width .5s var(--spring),height .5s var(--spring),opacity .2s}
@@ -281,12 +282,34 @@ input,select,textarea{transition:box-shadow .25s,border-color .25s,background-co
   #dlg,#rdlg{align-items:flex-end!important;padding-bottom:calc(10px + env(safe-area-inset-bottom,0px))!important}
   #dlg>.card,#rdlg>.card{max-width:none!important;width:100%;border-radius:30px}
 }
+@media(max-width:899px){
+  /* панель «Добавить»: липнет ровно над нижним меню (--nb считает скрипт, запасное значение — в calc) */
+  #regBody>.actions,#tonBody>.actions{bottom:var(--nb,calc(86px + env(safe-area-inset-bottom,0px)))}
+  /* нижний отступ — пустым блоком, а не padding: padding прибавлялся бы к смещению липкой панели */
+  .scr{padding-bottom:0}
+  .scr::after{content:"";display:block;height:calc(104px + env(safe-area-inset-bottom,0px))}
+  /* шапка не ломается на узком экране */
+  .top{flex-wrap:nowrap;gap:8px}
+  .tt{flex:1 1 auto}
+  .tt b{white-space:nowrap}
+  .by{display:none}
+  .top #st{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .top .ico{flex:none}
+  #auth{flex:0 1 auto;min-width:0;max-width:44vw;padding:6px 10px;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+}
 /* уведомление выпрыгивает сверху, как «островок» */
 #toast{animation:toastIn .55s var(--spring) both}
 /* график «прорисовывается» при смене режима и периода */
 #chart svg.enter{animation:wipe .8s var(--out) both}
 /* плавная смена темы и акцента */
 html.tt *,html.tt *::before,html.tt *::after{transition:background-color .4s ease,color .4s ease,border-color .4s ease,fill .4s ease,stroke .4s ease!important}
+
+/* ===== v10: без синих вспышек и выделений при нажатии ===== */
+*{-webkit-tap-highlight-color:transparent}
+button,summary,.tile,.tp,.pairs button,.qa button,.nav,.seg,.swb,.tgl,.ico,.li[data-edit]{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;touch-action:manipulation}
+button:focus,summary:focus,.tile:focus,[role=button]:focus{outline:none}
+button:focus-visible,summary:focus-visible,.tile:focus-visible,[role=button]:focus-visible{outline:2px solid color-mix(in srgb,var(--ac) 55%,transparent);outline-offset:2px}
+::selection{background:color-mix(in srgb,var(--ac) 22%,transparent);color:inherit}
 </style>
 </head>
 <body>
@@ -1599,6 +1622,23 @@ $('rep_csv').onclick=()=>{
   }
   /* 5. плавный переход при смене темы и акцента */
   let tm=0;new MutationObserver(()=>{root.classList.add('tt');clearTimeout(tm);tm=setTimeout(()=>root.classList.remove('tt'),500)}).observe(root,{attributes:true,attributeFilter:['data-theme','style']});
+})();
+
+/* ===== панель «Добавить» над нижним меню: считаем отступ по факту ===== */
+(function(){
+  const nav=document.querySelector('.nav'),mainEl=document.querySelector('main');
+  if(!nav||!mainEl)return;
+  const mq=matchMedia('(max-width:899px)');
+  const upd=()=>{
+    if(!mq.matches){mainEl.style.removeProperty('--nb');return}
+    const scr=document.querySelector('.scr:not([hidden])');if(!scr)return;
+    const nb=Math.round(scr.getBoundingClientRect().bottom-nav.getBoundingClientRect().top)+8;
+    if(nb>0&&nb<400)mainEl.style.setProperty('--nb',nb+'px');
+  };
+  addEventListener('resize',upd);addEventListener('orientationchange',upd);
+  if(window.visualViewport)visualViewport.addEventListener('resize',upd);
+  if(window.ResizeObserver)new ResizeObserver(upd).observe(nav);
+  upd();setTimeout(upd,300);setTimeout(upd,1200);
 })();
 </script>
 <script type="module">
