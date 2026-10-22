@@ -242,20 +242,16 @@ input:focus,select:focus,textarea:focus{border-color:var(--ac);box-shadow:0 0 0 
 
 /* ===== v9: плавные анимации в духе iOS ===== */
 :root{--spring:cubic-bezier(.34,1.3,.5,1);--out:cubic-bezier(.2,.8,.2,1)}
-@keyframes scrIn{from{opacity:0;transform:translate3d(var(--dx,0px),10px,0)}to{opacity:1;transform:none}}
+
 @keyframes riseIn{from{opacity:0;transform:translateY(14px) scale(.985)}to{opacity:1;transform:none}}
 @keyframes fadeIn2{from{opacity:0}to{opacity:1}}
 @keyframes sheetUp{from{opacity:0;transform:translateY(44px) scale(.96)}to{opacity:1;transform:none}}
 @keyframes toastIn{from{opacity:0;transform:translate(-50%,-24px) scale(.86)}to{opacity:1;transform:translate(-50%,0) scale(1)}}
 @keyframes wipe{from{clip-path:inset(-24px 100% -24px -24px);opacity:.35}to{clip-path:inset(-24px -24px -24px -24px);opacity:1}}
 /* экраны: мягкий сдвиг по направлению вкладки + каскад карточек */
-.scr:not([hidden]){animation:scrIn .42s var(--out) backwards}
-.scr:not([hidden])>*,.scr:not([hidden]) .hc1>*,.scr:not([hidden]) .hc2>*{animation:riseIn .5s var(--out) backwards}
-.scr>*:nth-child(2),.hc1>*:nth-child(2),.hc2>*:nth-child(2){animation-delay:.05s!important}
-.scr>*:nth-child(3),.hc1>*:nth-child(3),.hc2>*:nth-child(3){animation-delay:.10s!important}
-.scr>*:nth-child(4),.hc1>*:nth-child(4),.hc2>*:nth-child(4){animation-delay:.15s!important}
-.scr>*:nth-child(5),.hc1>*:nth-child(5),.hc2>*:nth-child(5){animation-delay:.20s!important}
-.scr>*:nth-child(6),.hc1>*:nth-child(6),.hc2>*:nth-child(6){animation-delay:.25s!important}
+@keyframes scrFade{from{opacity:0;transform:scale(.985)}to{opacity:1;transform:none}}
+.scr:not([hidden]){animation:scrFade .2s ease-out backwards}
+.scr:not([hidden])>*,.scr:not([hidden]) .hc1>*,.scr:not([hidden]) .hc2>*{animation:scrFade .2s ease-out backwards}
 .scr>*:nth-child(n+7),.hc1>*:nth-child(n+7){animation-delay:.30s!important}
 #hv_all:not([hidden]),#hv_ton:not([hidden]),[id^=sb_]:not([hidden]){animation:riseIn .38s var(--out) backwards}
 details[open]>*:not(summary){animation:riseIn .35s var(--out) backwards}
@@ -272,7 +268,7 @@ input,select,textarea{transition:box-shadow .25s,border-color .25s,background-co
 .nav.has-thumb{position:fixed}
 .has-thumb>button{position:relative;z-index:1}
 .gthumb{position:absolute;left:0;top:0;z-index:0;width:0;height:0;opacity:0;border-radius:999px;background:var(--thumb);box-shadow:0 2px 10px rgba(0,0,0,.14),inset 0 1px 0 var(--gh);pointer-events:none}
-.gthumb.ready{transition:transform .5s var(--spring),width .5s var(--spring),height .5s var(--spring),opacity .2s}
+.gthumb.ready{transition:transform .38s cubic-bezier(.32,.72,.28,1),width .38s cubic-bezier(.32,.72,.28,1),height .38s cubic-bezier(.32,.72,.28,1),opacity .15s ease}
 .nav .gthumb{border-radius:28px}
 .has-thumb>button.on,.has-thumb>button.on[data-t=s],.has-thumb>button.on[data-t=ton],.has-thumb>button.on[data-t=i],.has-thumb>button.on[data-t=o]{background:transparent!important;box-shadow:none!important}
 /* всплывающие окна: шторка снизу, как в iOS */
@@ -310,15 +306,426 @@ button,summary,.tile,.tp,.pairs button,.qa button,.nav,.seg,.swb,.tgl,.ico,.li[d
 button:focus,summary:focus,.tile:focus,[role=button]:focus{outline:none}
 button:focus-visible,summary:focus-visible,.tile:focus-visible,[role=button]:focus-visible{outline:2px solid color-mix(in srgb,var(--ac) 55%,transparent);outline-offset:2px}
 ::selection{background:color-mix(in srgb,var(--ac) 22%,transparent);color:inherit}
+
+/* ===== v11: «Итоги» — навигация сеткой с иконками ===== */
+.seg.subnav{display:grid;grid-template-columns:repeat(4,1fr);grid-auto-flow:row;grid-auto-columns:auto;gap:6px;padding:6px;border-radius:26px;overflow:visible;margin-bottom:14px}
+.subnav button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;padding:11px 2px 10px;border-radius:18px;font-size:11.5px;font-weight:600;letter-spacing:.1px;min-width:0}
+.subnav button span{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.subnav button svg{width:22px;height:22px;flex:none;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;transition:transform .38s var(--spring)}
+.seg.subnav button.on{color:var(--ac)}
+.seg.subnav button.on svg{transform:translateY(-1px) scale(1.08)}
+.subnav .gthumb{border-radius:18px}
+@media(min-width:640px){.seg.subnav{grid-template-columns:repeat(7,1fr)}}
+
+/* ===== v12: Liquid Glass 2 — живой фон, стеклянные кромки, иконки ===== */
+@property --ang{syntax:'<angle>';initial-value:0deg;inherits:false}
+
+:root{--i-plus:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cpath d=%22M12 5v14M5 12h14%22/%3E%3C/svg%3E");--i-check:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cpath d=%22M5 12.5l4.5 4.5L19 7.5%22/%3E%3C/svg%3E");--i-x:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cpath d=%22M6 6l12 12M18 6L6 18%22/%3E%3C/svg%3E");--i-dl:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cpath d=%22M17 7L7 17M7 9v8h8%22/%3E%3C/svg%3E");--i-ur:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cpath d=%22M7 17L17 7M9 7h8v8%22/%3E%3C/svg%3E");--i-trayd:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cpath d=%22M12 4v10M8 10l4 4 4-4M5 16v3h14v-3%22/%3E%3C/svg%3E");--i-trayu:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cpath d=%22M12 14V4M8 8l4-4 4 4M5 16v3h14v-3%22/%3E%3C/svg%3E");--i-ton:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cpath d=%22M5 6.5h14L12 19.5zM12 6.5v13%22/%3E%3C/svg%3E");--i-star:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cpath d=%22M12 3.5l2.6 5.4 5.9.8-4.3 4.1 1 5.9-5.2-2.8-5.2 2.8 1-5.9L3.5 9.7l5.9-.8z%22/%3E%3C/svg%3E");--i-repeat:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cpath d=%22M17 3l4 4-4 4M21 7H8a4 4 0 0 0-4 4M7 21l-4-4 4-4M3 17h13a4 4 0 0 0 4-4%22/%3E%3C/svg%3E");--i-copy:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cpath d=%22M9 9h11v11H9zM5 15V4h11%22/%3E%3C/svg%3E");--i-download:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cpath d=%22M12 4v11M7.5 11.5L12 16l4.5-4.5M5 20h14%22/%3E%3C/svg%3E");--i-upload:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cpath d=%22M12 16V5M7.5 9.5L12 5l4.5 4.5M5 20h14%22/%3E%3C/svg%3E");--i-eye:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cpath d=%22M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12z%22/%3E%3Ccircle cx=%2212%22 cy=%2212%22 r=%223%22/%3E%3C/svg%3E");--i-printer:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cpath d=%22M7 9V4h10v5M7 17H5a1 1 0 0 1-1-1v-6a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1h-2M7 14h10v6H7z%22/%3E%3C/svg%3E");--i-trash:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cpath d=%22M5 7h14M10 7V4h4v3M7 7l1 13h8l1-13M10 11v6M14 11v6%22/%3E%3C/svg%3E");--i-list:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cpath d=%22M9 6h11M9 12h11M9 18h11M4.5 6h.01M4.5 12h.01M4.5 18h.01%22/%3E%3C/svg%3E");--i-swap:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cpath d=%22M7 8h13M16 4l4 4-4 4M17 16H4M8 12l-4 4 4 4%22/%3E%3C/svg%3E");--i-trend:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cpath d=%22M4 16l5-5 4 4 7-8M15 7h5v5%22/%3E%3C/svg%3E");--i-wallet:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cpath d=%22M4 7h15a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1zM4 7l2-3h11M16 13h.01%22/%3E%3C/svg%3E");--i-layers:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cpath d=%22M12 4l9 5-9 5-9-5zM3 14l9 5 9-5%22/%3E%3C/svg%3E");--i-tag:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cpath d=%22M3 12V4h8l10 10-8 8z%22/%3E%3Cpath d=%22M7.5 8.5h.01%22/%3E%3C/svg%3E");--i-clock:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Ccircle cx=%2212%22 cy=%2212%22 r=%229%22/%3E%3Cpath d=%22M12 7v5l3 2%22/%3E%3C/svg%3E");--i-cal:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cpath d=%22M4 6h16v14H4zM4 10h16M8 3v4M16 3v4%22/%3E%3C/svg%3E");--i-cal30:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cpath d=%22M4 6h16v14H4zM4 10h16M8 3v4M16 3v4M8 14h.01M12 14h.01M16 14h.01M8 17h.01M12 17h.01%22/%3E%3C/svg%3E");--i-inf:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cpath d=%22M7 9a3 3 0 1 0 0 6c3 0 7-6 10-6a3 3 0 1 1 0 6c-3 0-7-6-10-6z%22/%3E%3C/svg%3E");--i-pct:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cpath d=%22M19 5L5 19M7.5 8a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zM16.5 19a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z%22/%3E%3C/svg%3E");--i-sun:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Ccircle cx=%2212%22 cy=%2212%22 r=%224%22/%3E%3Cpath d=%22M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4%22/%3E%3C/svg%3E");--i-moon:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cpath d=%22M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z%22/%3E%3C/svg%3E");--i-half:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Ccircle cx=%2212%22 cy=%2212%22 r=%229%22/%3E%3Cpath d=%22M12 3v18%22/%3E%3C/svg%3E");--i-refresh:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cpath d=%22M4 12a8 8 0 0 1 14-5.3L20 9M20 4v5h-5M20 12a8 8 0 0 1-14 5.3L4 15M4 20v-5h5%22/%3E%3C/svg%3E");--i-globe:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Ccircle cx=%2212%22 cy=%2212%22 r=%229%22/%3E%3Cpath d=%22M3 12h18M12 3c3 3.5 3 14.5 0 18M12 3c-3 3.5-3 14.5 0 18%22/%3E%3C/svg%3E");
+ --lg-blur:blur(26px) saturate(190%) brightness(1.05);
+ --lg-tint:rgba(255,255,255,.46);--rim-a:rgba(255,255,255,.98);--rim-b:rgba(255,255,255,.38);--rim-c:rgba(255,255,255,.85);
+ --lens:rgba(255,255,255,.78);--lt1:.34;--lt2:.06;--lrim:.85;--blob-o:.55;--gs:0 12px 34px rgba(60,80,140,.16),0 1px 2px rgba(60,80,140,.10);
+ --c1:var(--ac);--c2:#9a8cf0;--c3:#52cdbd;--c4:#f59ec3}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--lg-tint:rgba(255,255,255,.065);--rim-a:rgba(255,255,255,.58);--rim-b:rgba(255,255,255,.05);--rim-c:rgba(255,255,255,.22);--lens:rgba(255,255,255,.075);--lt1:.13;--lt2:.02;--lrim:.4;--blob-o:.42;--gs:0 14px 44px rgba(0,0,0,.55),0 1px 2px rgba(0,0,0,.4);--c2:#7c6fd6;--c3:#2fa99a;--c4:#c8648f}}
+:root[data-theme="dark"]{--lg-tint:rgba(255,255,255,.065);--rim-a:rgba(255,255,255,.58);--rim-b:rgba(255,255,255,.05);--rim-c:rgba(255,255,255,.22);--lens:rgba(255,255,255,.075);--lt1:.13;--lt2:.02;--lrim:.4;--blob-o:.42;--gs:0 14px 44px rgba(0,0,0,.55),0 1px 2px rgba(0,0,0,.4);--c2:#7c6fd6;--c3:#2fa99a;--c4:#c8648f}
+
+
+body{background-image:none}
+main{position:relative;z-index:1}
+/* материал стекла: тонкая заливка, сильное размытие, диагональный блик по кромке */
+.card,.tile,.hero,.qa button,.tp,.ico,.pairs button,button.ghost,.seg,.nav,.lm,#toast{
+ background:linear-gradient(152deg,rgba(255,255,255,.16),rgba(255,255,255,.02) 44%,rgba(255,255,255,.07)),var(--lg-tint);
+ -webkit-backdrop-filter:var(--lg-blur);backdrop-filter:var(--lg-blur);border:0;box-shadow:var(--gs);
+ transition:transform .38s var(--spring),background-color .25s,color .25s,opacity .2s,box-shadow .25s}
+.card,.tile,.hero,.qa button,.tp,.ico,.pairs button,button.ghost{position:relative}
+.card::after,.tile::after,.hero::after,.qa button::after,.tp::after,.ico::after,.pairs button::after,button.ghost::after,.seg::after,.nav::after,.lm::after,#toast::after{
+ content:"";position:absolute;inset:0;border-radius:inherit;padding:1px;pointer-events:none;z-index:2;
+ background:linear-gradient(152deg,var(--rim-a),var(--rim-b) 30%,transparent 54%,var(--rim-b) 78%,var(--rim-c));
+ -webkit-mask-image:linear-gradient(#000,#000),linear-gradient(#000,#000);-webkit-mask-clip:content-box,border-box;-webkit-mask-composite:xor;
+ mask-image:linear-gradient(#000,#000),linear-gradient(#000,#000);mask-clip:content-box,border-box;mask-composite:exclude}
+/* переливающаяся кромка у главных элементов */
+.hero::after,.nav::after{background:linear-gradient(152deg,var(--rim-a),var(--rim-b) 30%,transparent 54%,var(--rim-b) 78%,var(--rim-c))}
+}
+.hero{isolation:isolate}
+.hero::before{content:"";position:absolute;z-index:-1;width:72%;aspect-ratio:1;right:-18%;top:-70%;border-radius:50%;pointer-events:none;background:radial-gradient(circle,color-mix(in srgb,var(--ac) 62%,transparent),transparent 66%);filter:blur(30px);opacity:.7;animation:lgFloat 14s ease-in-out infinite alternate}
+@keyframes lgFloat{from{transform:translate3d(0,0,0) scale(1)}to{transform:translate3d(-26%,34%,0) scale(1.25)}}
+.hero #hp{font-weight:700;letter-spacing:-.8px}
+.tile .ti{box-shadow:inset 0 1px 0 rgba(255,255,255,.35)}
+.tt b{font-size:19px;font-weight:700;letter-spacing:-.3px}
+.ico{width:38px;height:38px}
+
+/* линза выбора: выпуклое стекло, упруго «перетекает» между пунктами */
+.gthumb{background:linear-gradient(180deg,rgba(255,255,255,var(--lt1)),rgba(255,255,255,var(--lt2))),var(--lens)!important;
+ box-shadow:inset 0 1px 0 rgba(255,255,255,var(--lrim)),inset 0 -1px 1px rgba(255,255,255,.12),inset 0 0 14px rgba(255,255,255,.06),0 6px 18px rgba(0,0,0,.22)!important;
+ -webkit-backdrop-filter:blur(6px) saturate(200%) brightness(1.12);backdrop-filter:blur(6px) saturate(200%) brightness(1.12)}
+.nav button{transition:color .25s,transform .38s var(--spring)}
+.nav button.on svg{filter:drop-shadow(0 0 7px color-mix(in srgb,var(--ac) 55%,transparent))}
+
+/* кнопки: тонированное стекло с бегущим бликом */
+#add,#tn_add,#tn_new,#saveStart,#rd_y,#imp_a,#rep_pr,#bk_show{position:relative;overflow:hidden;border:0;
+ color:var(--acf,#fff);background:linear-gradient(180deg,color-mix(in srgb,var(--acb,#41618f) 78%,#fff),var(--acb,#41618f) 70%,color-mix(in srgb,var(--acb,#41618f) 90%,#000));
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.5),inset 0 -1px 0 rgba(0,0,0,.14),0 8px 22px color-mix(in srgb,var(--acb,#41618f) 38%,transparent)}
+#add::after,#tn_add::after,#tn_new::after,#saveStart::after,#rd_y::after,#imp_a::after,#rep_pr::after,#bk_show::after{content:"";position:absolute;inset:0;pointer-events:none;
+ background:linear-gradient(105deg,transparent 36%,rgba(255,255,255,.5) 50%,transparent 64%);transform:translateX(-130%);animation:lgSweep 6.5s ease-in-out infinite}
+@keyframes lgSweep{0%,58%{transform:translateX(-130%)}100%{transform:translateX(130%)}}
+button.danger{background:var(--lg-tint);-webkit-backdrop-filter:var(--lg-blur);backdrop-filter:var(--lg-blur)}
+#add:disabled,#imp_a:disabled{opacity:.45}
+
+/* поля: вдавленное стекло */
+input,select,textarea{background:rgba(255,255,255,.05);border:1px solid var(--gb);box-shadow:inset 0 1px 3px rgba(0,0,0,.18),inset 0 1px 0 rgba(255,255,255,.04)}
+:root:not([data-theme="dark"]) input,:root:not([data-theme="dark"]) select,:root:not([data-theme="dark"]) textarea{background:rgba(255,255,255,.55)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) input,:root:not([data-theme="light"]) select,:root:not([data-theme="light"]) textarea{background:rgba(255,255,255,.05)}}
+:root[data-theme="dark"] input,:root[data-theme="dark"] select,:root[data-theme="dark"] textarea{background:rgba(255,255,255,.05)}
+
+/* иконки на кнопках */
+.seg button[data-t="b"],
+.seg button[data-t="s"],
+.seg button[data-t="i"],
+.seg button[data-t="o"],
+.seg button[data-t="ton"],
+.seg button[data-hv="all"],
+.seg button[data-hv="ton"],
+.seg button[data-tf="all"],
+.seg button[data-tf="b"],
+.seg button[data-tf="s"],
+.seg button[data-tf="io"],
+.seg button[data-cm="pf"],
+.seg button[data-cm="bal"],
+.seg button[data-cm="cap"],
+.seg button[data-cm="cost"],
+.seg button[data-flt="all"],
+.seg button[data-flt="today"],
+.seg button[data-flt="7"],
+.seg button[data-flt="30"],
+.seg button[data-bks="p"],
+.seg button[data-bks="a"],
+.seg button[data-bks="v"],
+.seg button[data-bks="n"],
+.seg button[data-th="auto"],
+.seg button[data-th="light"],
+.seg button[data-th="dark"],
+button#add,
+button#cancel,
+button#again,
+button#imp_a,
+button#imp_c,
+button#bk_show,
+button#bk_copy,
+button#bk_load,
+button#bk_csv,
+button#rep_pr,
+button#rep_csv,
+button#rp_c,
+button#tn_add,
+button#tn_new,
+button#tn_cancel,
+button#rd_y,
+button#rd_n,
+button#dy,
+button#dn,
+button#saveStart,
+button#reset,
+button#ui_all{display:inline-flex;align-items:center;justify-content:center;gap:.42em}
+.seg button[data-t="b"]::before,
+.seg button[data-t="s"]::before,
+.seg button[data-t="i"]::before,
+.seg button[data-t="o"]::before,
+.seg button[data-t="ton"]::before,
+.seg button[data-hv="all"]::before,
+.seg button[data-hv="ton"]::before,
+.seg button[data-tf="all"]::before,
+.seg button[data-tf="b"]::before,
+.seg button[data-tf="s"]::before,
+.seg button[data-tf="io"]::before,
+.seg button[data-cm="pf"]::before,
+.seg button[data-cm="bal"]::before,
+.seg button[data-cm="cap"]::before,
+.seg button[data-cm="cost"]::before,
+.seg button[data-flt="all"]::before,
+.seg button[data-flt="today"]::before,
+.seg button[data-flt="7"]::before,
+.seg button[data-flt="30"]::before,
+.seg button[data-bks="p"]::before,
+.seg button[data-bks="a"]::before,
+.seg button[data-bks="v"]::before,
+.seg button[data-bks="n"]::before,
+.seg button[data-th="auto"]::before,
+.seg button[data-th="light"]::before,
+.seg button[data-th="dark"]::before,
+button#add::before,
+button#cancel::before,
+button#again::before,
+button#imp_a::before,
+button#imp_c::before,
+button#bk_show::before,
+button#bk_copy::before,
+button#bk_load::before,
+button#bk_csv::before,
+button#rep_pr::before,
+button#rep_csv::before,
+button#rp_c::before,
+button#tn_add::before,
+button#tn_new::before,
+button#tn_cancel::before,
+button#rd_y::before,
+button#rd_n::before,
+button#dy::before,
+button#dn::before,
+button#saveStart::before,
+button#reset::before,
+button#ui_all::before{content:"";flex:none;width:1.12em;height:1.12em;background:currentColor;-webkit-mask:var(--i) center/contain no-repeat;mask:var(--i) center/contain no-repeat}
+.seg button[data-t="b"]{--i:var(--i-dl)}
+.seg button[data-t="s"]{--i:var(--i-ur)}
+.seg button[data-t="i"]{--i:var(--i-trayd)}
+.seg button[data-t="o"]{--i:var(--i-trayu)}
+.seg button[data-t="ton"]{--i:var(--i-ton)}
+.seg button[data-hv="all"]{--i:var(--i-list)}
+.seg button[data-hv="ton"]{--i:var(--i-ton)}
+.seg button[data-tf="all"]{--i:var(--i-list)}
+.seg button[data-tf="b"]{--i:var(--i-dl)}
+.seg button[data-tf="s"]{--i:var(--i-ur)}
+.seg button[data-tf="io"]{--i:var(--i-swap)}
+.seg button[data-cm="pf"]{--i:var(--i-trend)}
+.seg button[data-cm="bal"]{--i:var(--i-wallet)}
+.seg button[data-cm="cap"]{--i:var(--i-layers)}
+.seg button[data-cm="cost"]{--i:var(--i-tag)}
+.seg button[data-flt="all"]{--i:var(--i-inf)}
+.seg button[data-flt="today"]{--i:var(--i-clock)}
+.seg button[data-flt="7"]{--i:var(--i-cal)}
+.seg button[data-flt="30"]{--i:var(--i-cal30)}
+.seg button[data-bks="p"]{--i:var(--i-trend)}
+.seg button[data-bks="a"]{--i:var(--i-pct)}
+.seg button[data-bks="v"]{--i:var(--i-layers)}
+.seg button[data-bks="n"]{--i:var(--i-list)}
+.seg button[data-th="auto"]{--i:var(--i-half)}
+.seg button[data-th="light"]{--i:var(--i-sun)}
+.seg button[data-th="dark"]{--i:var(--i-moon)}
+button#add{--i:var(--i-check)}
+button#cancel{--i:var(--i-x)}
+button#again{--i:var(--i-repeat)}
+button#imp_a{--i:var(--i-check)}
+button#imp_c{--i:var(--i-trash)}
+button#bk_show{--i:var(--i-eye)}
+button#bk_copy{--i:var(--i-copy)}
+button#bk_load{--i:var(--i-upload)}
+button#bk_csv{--i:var(--i-download)}
+button#rep_pr{--i:var(--i-printer)}
+button#rep_csv{--i:var(--i-download)}
+button#rp_c{--i:var(--i-copy)}
+button#tn_add{--i:var(--i-plus)}
+button#tn_new{--i:var(--i-plus)}
+button#tn_cancel{--i:var(--i-x)}
+button#rd_y{--i:var(--i-check)}
+button#rd_n{--i:var(--i-x)}
+button#dy{--i:var(--i-check)}
+button#dn{--i:var(--i-x)}
+button#saveStart{--i:var(--i-check)}
+button#reset{--i:var(--i-trash)}
+button#ui_all{--i:var(--i-refresh)}
+
+/* переключатели с иконками: значок сверху, подпись снизу, как у вкладок iOS */
+.seg button[data-t],.seg button[data-hv],.seg button[data-tf],.seg button[data-cm],.seg button[data-bks],.seg button[data-th]{flex-direction:column;gap:3px;padding:7px 2px 6px;line-height:1.15;min-width:0}
+.seg button[data-t]::before,.seg button[data-hv]::before,.seg button[data-tf]::before,.seg button[data-cm]::before,.seg button[data-bks]::before,.seg button[data-th]::before{width:18px;height:18px;transition:transform .38s var(--spring)}
+.seg button.on[data-t]::before,.seg button.on[data-hv]::before,.seg button.on[data-tf]::before,.seg button.on[data-cm]::before,.seg button.on[data-bks]::before,.seg button.on[data-th]::before{transform:scale(1.14) translateY(-1px)}
+#t_add .seg button[data-t]{font-size:10.5px;letter-spacing:-.15px}
+#cmodes button{font-size:10.5px}
+.seg button[data-flt]{gap:5px}.seg button[data-flt]::before{width:15px;height:15px}
+.qa button svg{width:36px;height:36px;padding:8px;border-radius:50%;background:color-mix(in srgb,currentColor 15%,transparent);box-shadow:inset 0 1px 0 rgba(255,255,255,.28);stroke-width:2.1}
+.qa button{gap:7px;padding:12px 4px 11px}
+
+/* валютная пара теперь в «Ещё» */
+#pairCard .pairs{flex-wrap:wrap;overflow:visible;padding:2px 0 0;gap:8px}
+#pairCard .pairs button{padding:8px 14px}
+.pairs button.on{background:linear-gradient(180deg,color-mix(in srgb,var(--ac) 30%,transparent),color-mix(in srgb,var(--ac) 14%,transparent)),var(--lg-tint);color:var(--ac)}
+.tgr .tgl{flex:none}
+
+/* спокойный режим: без анимации фона и переливов */
+html[data-fx="calm"] .hero::before,html[data-fx="calm"] .hero::after,html[data-fx="calm"] .nav::after,html[data-fx="calm"] #add::after,html[data-fx="calm"] #tn_add::after,html[data-fx="calm"] #tn_new::after,html[data-fx="calm"] #saveStart::after,html[data-fx="calm"] #rd_y::after,html[data-fx="calm"] #imp_a::after,html[data-fx="calm"] #rep_pr::after,html[data-fx="calm"] #bk_show::after{animation:none}
+html[data-fx="calm"] .hero::before{display:none}
+@media(prefers-reduced-motion:reduce){.hero::before,.hero::after,.nav::after,#add::after{animation:none!important}}
+@media print{
+.nav button.on,.nav button.on span{color:var(--tx)!important}
+.nav button.on svg{color:var(--tx)}
+
+/* ===== v14: Liquid Glass — плавные доработки ===== */
+/* каскадное появление пунктов списков при открытии вкладки */
+@keyframes liIn{from{opacity:0}to{opacity:1}}
+.scr.enter .li,.scr.enter .dh{animation:liIn .2s ease backwards}
+.scr.enter .li:nth-child(1),.scr.enter .dh:nth-child(1){animation-delay:.015s}
+.scr.enter .li:nth-child(2),.scr.enter .dh:nth-child(2){animation-delay:.03s}
+.scr.enter .li:nth-child(3),.scr.enter .dh:nth-child(3){animation-delay:.045s}
+.scr.enter .li:nth-child(4),.scr.enter .dh:nth-child(4){animation-delay:.06s}
+.scr.enter .li:nth-child(5),.scr.enter .dh:nth-child(5){animation-delay:.075s}
+.scr.enter .li:nth-child(6),.scr.enter .dh:nth-child(6){animation-delay:.09s}
+.scr.enter .li:nth-child(n+7){animation-delay:.105s}
+.scr.enter .li:nth-child(n+16),.scr.enter .dh:nth-child(n+16){animation:none}
+/* полосы прогресса и объёма — с пружинным дожимом */
+.prog i,.mb i{transition:width .8s var(--spring),background-color .3s}
+/* плавное отпружинивание наклона стекла */
+.tiltg{transform-style:preserve-3d;will-change:transform}
+@media(prefers-reduced-motion:reduce){.scr.enter .li,.scr.enter .dh{animation:none}}
+
+/* ===== v15: Оформление v2 — превью тем, стекло-ползунки ===== */
+.thpick{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:4px 0 6px}
+.thpick>button{display:flex;flex-direction:column;align-items:center;gap:8px;padding:11px 6px 10px;background:var(--s2);border:1px solid var(--gb);border-radius:20px;color:var(--tx);font-size:12px;font-weight:600;box-shadow:none;transition:transform .38s var(--spring),box-shadow .2s,border-color .2s}
+.thpick>button:hover{transform:translateY(-2px)}
+.thpick>button:active{transform:scale(.96)}
+.thpick>button .pv{position:relative;display:block;width:100%;height:52px;border-radius:14px;overflow:hidden;border:1px solid var(--bd)}
+.thpick>button .pv i{position:absolute;left:7px;top:7px;right:28%;height:7px;border-radius:99px}
+.thpick>button .pv b{position:absolute;left:7px;right:7px;top:19px;bottom:7px;border-radius:9px}
+.pvl{background:#e9ecf3}.pvl i{background:#41618f}.pvl b{background:#fff}
+.pvd{background:#08090c}.pvd i{background:#9db8e0}.pvd b{background:#1c2233}
+.pva{background:linear-gradient(90deg,#e9ecf3 50%,#08090c 50%)}.pva i{background:linear-gradient(90deg,#41618f 50%,#9db8e0 50%)}.pva b{background:linear-gradient(90deg,#fff 50%,#1c2233 50%)}
+.thpick>button.on{border-color:var(--ac);box-shadow:0 0 0 3px color-mix(in srgb,var(--ac) 28%,transparent)}
+/* образцы акцента крупнее, с галочкой выбранного */
+.sw{gap:12px;margin:10px 0 2px}
+.swb{position:relative;width:42px;height:42px;padding:0;border-radius:50%;background:var(--s);transition:transform .38s var(--spring),box-shadow .2s}
+.swb:hover{transform:scale(1.12)}
+.swb.on{box-shadow:0 0 0 2px var(--s1),0 0 0 4.5px var(--s)}
+.swb.on::after{content:"";position:absolute;inset:0;margin:auto;width:15px;height:15px;background:#fff;-webkit-mask:var(--i-check) center/contain no-repeat;mask:var(--i-check) center/contain no-repeat;filter:drop-shadow(0 1px 2px rgba(0,0,0,.45))}
+/* ползунки стекла */
+.sliderow{display:flex;flex-direction:column}
+input[type=range]{-webkit-appearance:none;appearance:none;height:7px;padding:0;border:0;border-radius:99px;background:linear-gradient(90deg,var(--ac) var(--fill,50%),var(--s2) var(--fill,50%));cursor:pointer}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:23px;height:23px;margin-top:0;border-radius:50%;background:#fff;box-shadow:0 2px 8px rgba(0,0,0,.35),0 0 0 1px rgba(0,0,0,.05);cursor:pointer}
+input[type=range]::-moz-range-thumb{width:23px;height:23px;border:0;border-radius:50%;background:#fff;box-shadow:0 2px 8px rgba(0,0,0,.35)}
+input[type=range]:focus{box-shadow:none;border:0;outline:none}
+
+/* iOS-таббар: пружинный «поп» иконки при переключении вкладки */
+@keyframes navPop{0%{transform:scale(.55)}55%{transform:scale(1.22)}100%{transform:scale(1)}}
+.nav button.on svg{animation:navPop .55s var(--spring)}
+.nav button.on span{animation:liIn .25s ease}
+@media(prefers-reduced-motion:reduce){.nav button.on svg,.nav button.on span{animation:none}}
+
+/* v16: твёрдая стеклянная пилюля в таббаре — без «слайма» */
+.nav .gthumb{background:linear-gradient(180deg,rgba(255,255,255,.55),rgba(255,255,255,.28)),var(--lens)!important;
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.85),inset 0 0 0 1px rgba(255,255,255,.32),0 4px 14px rgba(0,0,0,.22)!important;
+ transition:transform .38s cubic-bezier(.32,.72,.28,1),width .38s cubic-bezier(.32,.72,.28,1),height .38s cubic-bezier(.32,.72,.28,1),opacity .15s ease}
+/* иконка: мягкий «поп» без сильного перелёта */
+@keyframes navPop{0%{transform:scale(.72)}55%{transform:scale(1.1)}100%{transform:scale(1)}}
+
+/* ===== v17: шапка — гармоничный вид ===== */
+.top{align-items:center;gap:8px;padding:0 2px 10px}
+.top .lg{width:32px;height:32px}
+.top .lg svg{width:32px;height:32px}
+.top .tt{flex:1 1 auto;min-width:0;gap:1px;line-height:1.25}
+.top .tt b{display:flex;align-items:baseline;gap:7px;font-size:18px;font-weight:700;letter-spacing:-.3px;white-space:nowrap}
+.top .tt .by{font-size:9px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--mut)}
+.top #st{display:none}
+/* кнопка входа — как аккуратная стеклянная капсула в стиле остальных */
+.top #auth{display:inline-flex;align-items:center;justify-content:center;height:36px;min-height:36px;padding:0 14px;margin-left:auto;font-size:12px;font-weight:600;border-radius:999px;color:var(--ac);border:1px solid color-mix(in srgb,var(--ac) 45%,var(--gb));background:var(--gl);flex:0 1 auto;max-width:36vw;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* все круглые кнопки шапки — один размер */
+.top .ico{width:36px;height:36px;flex:none}
+@media(max-width:899px){.top #auth{max-width:34vw}}
+
+/* ===== v18: шапка компактнее ===== */
+.top .lg{width:28px;height:28px}
+.top .lg svg{width:28px;height:28px}
+.top .tt b{font-size:16px}
+.top #auth{height:32px;min-height:32px;padding:0 12px;font-size:11.5px}
+.top .ico{width:32px;height:32px;flex:none}
+.top .ico svg{width:17px;height:17px}
+
+/* ===== v19: живой фон-градиент и разнообразный блик стекла ===== */
+/* фон: мягкое свечение акцента сверху, без цветных пятен */
+body{background-attachment:fixed;background-image:
+ radial-gradient(110% 70% at 50% -18%, color-mix(in srgb,var(--ac) 10%,transparent), transparent 62%),
+ linear-gradient(180deg, color-mix(in srgb,var(--ac) 6%, var(--bg)), var(--bg) 38%)}
+/* блик: в тёмной теме — холодный голубой (настоящее тёмное стекло), в светлой — белый */
+:root{--sheen:rgba(255,255,255,.16),rgba(255,255,255,.02) 44%,rgba(255,255,255,.07)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--sheen:rgba(165,190,235,.20),rgba(165,190,235,.045) 44%,rgba(165,190,235,.10)}}
+:root[data-theme="dark"]{--sheen:rgba(165,190,235,.20),rgba(165,190,235,.045) 44%,rgba(165,190,235,.10)}
+.card,.tile,.hero,.qa button,.tp,.ico,.pairs button,button.ghost,.seg,.nav,.lm,#toast{background:linear-gradient(var(--ga,152deg),var(--sheen)),var(--lg-tint)}
+/* у каждой кнопки действия — свой угол блика */
+.qa button:nth-child(1){--ga:125deg}
+.qa button:nth-child(2){--ga:157deg}
+.qa button:nth-child(3){--ga:203deg}
+.qa button:nth-child(4){--ga:238deg}
+/* плитки — чередование направлений */
+.tile:nth-child(odd){--ga:142deg}
+.tile:nth-child(even){--ga:208deg}
+.hero{--ga:118deg}
 </style>
+<style id="perf">
+/* ===== perf: убрано самое дорогое для GPU/CPU, вид сохранён ===== */
+/* 1. размытие фона на плоском фоне ничего не меняет, но стоит дорого → оставлено только там, где под элементом реально проезжает контент (нижнее меню, плашка действий, уведомление, меню языка, затемнение диалога) */
+.card,.tile,.hero,.qa button,.tp,.ico,.pairs button,button.ghost,button.danger,.seg,.gthumb,#dlg .card,#rdlg .card{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+.nav{-webkit-backdrop-filter:blur(18px) saturate(170%);backdrop-filter:blur(18px) saturate(170%)}
+#regBody>.actions,#tonBody>.actions{-webkit-backdrop-filter:blur(14px) saturate(150%);backdrop-filter:blur(14px) saturate(150%)}
+#dlg,#rdlg{-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+/* 2. кнопки ✎ и × в списках: без широких теней и маски-кромки (их сотни) */
+button.ghost{box-shadow:inset 0 0 0 1px var(--gb)}
+button.ghost::after{content:none}
+button.ghost.more{display:block;width:100%;margin:10px 0 2px;padding:11px 14px}
+/* 3. фон не «прибит» к окну: листается .scr внутри, а не страница; fixed заставлял перерисовывать фон на каждом кадре скролла */
+body{background-attachment:scroll}
+/* 4. смена вкладки: одно лёгкое появление экрана вместо каскада анимаций на каждом блоке */
+@keyframes perfIn{from{opacity:0}to{opacity:1}}
+.scr:not([hidden]){animation:perfIn .16s ease-out}
+.scr:not([hidden])>*,.scr:not([hidden]) .hc1>*,.scr:not([hidden]) .hc2>*{animation:none}
+#hv_all:not([hidden]),#hv_ton:not([hidden]),[id^=sb_]:not([hidden]){animation:perfIn .16s ease-out}
+/* 5. световое пятно героя: градиент уже мягкий, blur(30px) на анимируемом слое не нужен */
+.hero::before{filter:none;will-change:transform}
+/* 6. блик на кнопках: два прохода вместо бесконечного цикла (бесконечная анимация не даёт экрану «засыпать») */
+#add::after,#tn_add::after,#tn_new::after,#saveStart::after,#rd_y::after,#imp_a::after,#rep_pr::after,#bk_show::after{animation-iteration-count:2}
+/* тёмная тема: без градиентов на кнопках и поверхностях */
+@media(prefers-color-scheme:dark){
+:root:not([data-theme="light"]) .card,:root:not([data-theme="light"]) .tile,:root:not([data-theme="light"]) .hero,:root:not([data-theme="light"]) .qa button,:root:not([data-theme="light"]) .tp,:root:not([data-theme="light"]) .ico,:root:not([data-theme="light"]) .pairs button,:root:not([data-theme="light"]) button,:root:not([data-theme="light"]) button.ghost,:root:not([data-theme="light"]) .seg,:root:not([data-theme="light"]) .nav,:root:not([data-theme="light"]) .lm,:root:not([data-theme="light"]) #toast,:root:not([data-theme="light"]) .gthumb,:root:not([data-theme="light"]) .pairs button.on,:root:not([data-theme="light"]) #regBody>.actions,:root:not([data-theme="light"]) #tonBody>.actions{background-image:none!important}
+:root:not([data-theme="light"]) #add,:root:not([data-theme="light"]) #tn_add,:root:not([data-theme="light"]) #tn_new,:root:not([data-theme="light"]) #saveStart,:root:not([data-theme="light"]) #rd_y,:root:not([data-theme="light"]) #imp_a,:root:not([data-theme="light"]) #rep_pr,:root:not([data-theme="light"]) #bk_show,:root:not([data-theme="light"]) #tg_a,:root:not([data-theme="light"]) #dy{background-color:var(--acb,#41618f)!important}
+:root:not([data-theme="light"]) body{background-image:none!important}
+}
+:root[data-theme="dark"] .card,:root[data-theme="dark"] .tile,:root[data-theme="dark"] .hero,:root[data-theme="dark"] .qa button,:root[data-theme="dark"] .tp,:root[data-theme="dark"] .ico,:root[data-theme="dark"] .pairs button,:root[data-theme="dark"] button,:root[data-theme="dark"] button.ghost,:root[data-theme="dark"] .seg,:root[data-theme="dark"] .nav,:root[data-theme="dark"] .lm,:root[data-theme="dark"] #toast,:root[data-theme="dark"] .gthumb,:root[data-theme="dark"] .pairs button.on,:root[data-theme="dark"] #regBody>.actions,:root[data-theme="dark"] #tonBody>.actions{background-image:none!important}
+:root[data-theme="dark"] #add,:root[data-theme="dark"] #tn_add,:root[data-theme="dark"] #tn_new,:root[data-theme="dark"] #saveStart,:root[data-theme="dark"] #rd_y,:root[data-theme="dark"] #imp_a,:root[data-theme="dark"] #rep_pr,:root[data-theme="dark"] #bk_show,:root[data-theme="dark"] #tg_a,:root[data-theme="dark"] #dy{background-color:var(--acb,#41618f)!important}
+:root[data-theme="dark"] body{background-image:none!important}
+/* тёмная тема: однотонные края */
+@media(prefers-color-scheme:dark){
+:root:not([data-theme="light"]) .card::after,:root:not([data-theme="light"]) .tile::after,:root:not([data-theme="light"]) .hero::after,:root:not([data-theme="light"]) .qa button::after,:root:not([data-theme="light"]) .tp::after,:root:not([data-theme="light"]) .ico::after,:root:not([data-theme="light"]) .pairs button::after,:root:not([data-theme="light"]) .seg::after,:root:not([data-theme="light"]) .nav::after,:root:not([data-theme="light"]) .lm::after,:root:not([data-theme="light"]) #toast::after{background:rgba(255,255,255,.16)!important}
+}
+:root[data-theme="dark"] .card::after,:root[data-theme="dark"] .tile::after,:root[data-theme="dark"] .hero::after,:root[data-theme="dark"] .qa button::after,:root[data-theme="dark"] .tp::after,:root[data-theme="dark"] .ico::after,:root[data-theme="dark"] .pairs button::after,:root[data-theme="dark"] .seg::after,:root[data-theme="dark"] .nav::after,:root[data-theme="dark"] .lm::after,:root[data-theme="dark"] #toast::after{background:rgba(255,255,255,.16)!important}
+/* iOS: без тяжёлых слоёв (размытие под фикс. элементами, маски-кромки, анимации) — защита от зависаний */
+html.ios .nav,html.ios #regBody>.actions,html.ios #tonBody>.actions,html.ios #toast,html.ios .lm,html.ios #dlg,html.ios #rdlg{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+html.ios .nav,html.ios #regBody>.actions,html.ios #tonBody>.actions,html.ios #toast,html.ios .lm{background:var(--s1)!important}
+html.ios .nav::after{display:none}
+html.ios .card::after,html.ios .tile::after,html.ios .hero::after,html.ios .qa button::after,html.ios .tp::after,html.ios .ico::after,html.ios .pairs button::after,html.ios .seg::after,html.ios .lm::after,html.ios #toast::after{-webkit-mask:none!important;mask:none!important;background:none!important;box-shadow:inset 0 0 0 1px var(--bd)}
+html.ios .hero::before{display:none}
+html.ios *{animation-iteration-count:1!important}
+html.ios #chart svg.enter{animation:none}
+/* ползунки (Оформление): своя дорожка и крупный бегунок, жест не уходит в прокрутку страницы */
+input[type=range]{-webkit-appearance:none;appearance:none;display:block;width:100%;height:34px;margin:0;padding:0;border:0!important;border-radius:0;background:transparent!important;box-shadow:none!important;touch-action:none;cursor:pointer;outline:none;--fill:50%}
+input[type=range]::-webkit-slider-runnable-track{height:6px;border-radius:3px;background:linear-gradient(90deg,var(--ac) var(--fill),rgba(128,128,150,.32) var(--fill))}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:26px;height:26px;margin-top:-10px;border:0;border-radius:50%;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.38),0 0 0 .5px rgba(0,0,0,.1)}
+input[type=range]::-moz-range-track{height:6px;border-radius:3px;background:rgba(128,128,150,.32)}
+input[type=range]::-moz-range-progress{height:6px;border-radius:3px;background:var(--ac)}
+input[type=range]::-moz-range-thumb{width:26px;height:26px;border:0;border-radius:50%;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.38)}
+body.gdrag *{transition:none!important}
+.nav{-webkit-backdrop-filter:blur(var(--gblur,18px)) saturate(170%);backdrop-filter:blur(var(--gblur,18px)) saturate(170%)}
+#regBody>.actions,#tonBody>.actions{-webkit-backdrop-filter:blur(var(--gblur,18px)) saturate(150%);backdrop-filter:blur(var(--gblur,18px)) saturate(150%)}
+html.ios .nav,html.ios #regBody>.actions,html.ios #tonBody>.actions{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+/* фон в стиле Apple Music: крупные мягкие цветовые пятна медленно плывут за интерфейсом (градиенты без blur, анимация только transform — дёшево для GPU) */
+body{background-image:none!important}
+#amb{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;--ao:.62;--amb-g:#8c9099;--amb-d:#0b1233}
+:root[data-theme="light"] #amb{--ao:.42;--amb-g:#c3c7d2;--amb-d:#5b7bd0}
+@media(prefers-color-scheme:light){:root:not([data-theme="dark"]) #amb{--ao:.42;--amb-g:#c3c7d2;--amb-d:#5b7bd0}}
+#amb i{position:absolute;width:95vmax;height:95vmax;border-radius:50%;opacity:var(--ao);will-change:transform;transform:translate3d(0,0,0)}
+#amb i:nth-child(1){left:-48vmax;top:-22vmax;background:radial-gradient(circle,color-mix(in srgb,var(--ac) 75%,var(--amb-d)) 0,transparent 64%);animation:amb1 44s ease-in-out infinite alternate}
+#amb i:nth-child(2){right:-58vmax;top:-8vmax;background:radial-gradient(circle,var(--amb-g) 0,transparent 64%);animation:amb2 52s ease-in-out infinite alternate}
+#amb i:nth-child(3){left:-20vmax;bottom:-68vmax;background:radial-gradient(circle,color-mix(in srgb,var(--ac) 55%,var(--amb-d)) 0,transparent 64%);animation:amb3 60s ease-in-out infinite alternate}
+#amb i:nth-child(4){right:-34vmax;bottom:-62vmax;background:radial-gradient(circle,color-mix(in srgb,var(--amb-g) 70%,var(--ac)) 0,transparent 64%);animation:amb4 70s ease-in-out infinite alternate}
+@keyframes amb1{to{transform:translate3d(26vmax,16vmax,0) scale(1.18)}}
+@keyframes amb2{to{transform:translate3d(-22vmax,20vmax,0) scale(1.12)}}
+@keyframes amb3{to{transform:translate3d(24vmax,-14vmax,0) scale(1.2)}}
+@keyframes amb4{to{transform:translate3d(-28vmax,-12vmax,0) scale(1.1)}}
+html[data-fx="calm"] #amb i,html.ios #amb i{animation:none}
+@media(prefers-reduced-motion:reduce){#amb i{animation:none}}
+@media print{#amb{display:none}}
+</style>
+<script>try{var ua=navigator.userAgent,ios=/iP(hone|ad|od)/.test(ua)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);if(ios){document.documentElement.classList.add('ios');if(!localStorage.getItem('p2p_fx'))document.documentElement.dataset.fx='calm'}else if(!localStorage.getItem('p2p_fx')&&((navigator.hardwareConcurrency&&navigator.hardwareConcurrency<=4)||(navigator.deviceMemory&&navigator.deviceMemory<=4)))document.documentElement.dataset.fx='calm'}catch(e){}</script>
 </head>
 <body>
+<div id="amb" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
 <main>
 <div class="top"><span class="lg"><svg viewBox="0 0 32 32"><defs><linearGradient id="lg2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#52627f"/><stop offset="1" stop-color="#7a86a3"/></linearGradient></defs><rect width="32" height="32" rx="9" fill="url(#lg2)"/><path d="M9 12h13l-3.5-3.5M23 20H10l3.5 3.5" stroke="#fff" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span><div class="tt"><b>USDT / UAH <small class="by">by qkumori</small></b><span id="st"></span></div><button class="ghost" id="auth" type="button" hidden>Войти через Google</button><button class="ico" id="undoB" type="button" aria-label="Отменить" title="Отменить последнее действие (Ctrl+Z)" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg></button>
 <button class="ico" id="thm" type="button" aria-label="Тема"></button><button class="ico" id="lng" type="button" aria-label="Language" style="font-size:11px;font-weight:800"></button></div>
 <div class="lm" id="lm" hidden></div>
 
-<div class="pairs" id="pairs"></div>
 
 <section class="scr" id="t_home">
 <div class="hc1">
@@ -421,7 +828,7 @@ button:focus-visible,summary:focus-visible,.tile:focus-visible,[role=button]:foc
 </section>
 
 <section class="scr" id="t_stat" hidden>
-<div class="seg"><button class="on" data-sub="days">Дни</button><button data-sub="months">Месяцы</button><button data-sub="rates">Курсы</button><button data-sub="bal">Баланс</button><button data-sub="bk">Банки</button><button data-sub="turn">Оборот</button><button data-sub="cmp">Периоды</button><button data-sub="rep">Налоги</button></div>
+<div class="seg subnav" id="subnav"><button class="on" data-sub="days" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="3"/><path d="M8 3v4M16 3v4M4 10h16"/></svg><span>Дни</span></button><button data-sub="months" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="3"/><path d="M8 3v4M16 3v4M4 10h16M8 14h.01M12 14h.01M16 14h.01M8 17h.01M12 17h.01"/></svg><span>Месяцы</span></button><button data-sub="rates" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 16l5-5 4 4 7-8"/><path d="M15 7h5v5"/></svg><span>Курсы</span></button><button data-sub="bal" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="6.5" width="17" height="12" rx="3"/><path d="M3.5 10h17M16.5 14.5h.01"/></svg><span>Баланс</span></button><button data-sub="bk" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10l9-5 9 5M5.5 10v7.5M10 10v7.5M14 10v7.5M18.5 10v7.5M3 20h18"/></svg><span>Банки</span></button><button data-sub="turn" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 4l3 3-3 3M20 7H8a4 4 0 0 0-4 4M7 20l-3-3 3-3M4 17h12a4 4 0 0 0 4-4"/></svg><span>Оборот</span></button><button data-sub="cmp" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 20V11M12 20V5M18 20v-6"/></svg><span>Периоды</span></button></div>
 <div class="card" id="sb_days"><div id="days"></div></div>
 <div id="sb_months" hidden><div class="card"><div id="months"></div></div><div class="card"><h2>Отчёт текстом</h2><div class="seg"><button class="on" data-rp="7">7 дн.</button><button data-rp="30">30 дн.</button><button data-rp="0">Всё</button></div><textarea id="rp" readonly style="min-height:150px"></textarea><p class="hint"><button class="ghost" id="rp_c">Скопировать отчёт</button> <span id="rp_m"></span></p></div></div>
 <div id="sb_rates" hidden><div class="g2" id="rates"></div><div class="card"><h2>Если продать остаток</h2><label>Курс продажи сейчас</label><input id="wi_r" inputmode="decimal" placeholder="UAH за 1 USDT"><p class="hint" id="wi_t"></p></div></div>
@@ -436,16 +843,6 @@ button:focus-visible,summary:focus-visible,.tile:focus-visible,[role=button]:foc
 <p class="hint">Объём — сумма USDT по покупкам и продажам за период. Пополнения и выводы не считаются. Средний размер сделки = объём ÷ число сделок.</p>
 </div>
 <div id="sb_cmp" hidden><div id="cmp"></div></div>
-<div id="sb_rep" hidden>
-<div class="card" id="repCard">
-<div class="rephead"><h2 style="margin:0">Налоговый отчёт</h2><select id="rep_y" class="noprint" aria-label="Год"></select></div>
-<div class="seg noprint" id="rep_q"><button class="on" data-rq="0">Год</button><button data-rq="1">Q1</button><button data-rq="2">Q2</button><button data-rq="3">Q3</button><button data-rq="4">Q4</button></div>
-<div class="rtab" id="rep_t"></div>
-<p class="rephint" id="rep_s"></p>
-<p class="rephint"><b>Как считается:</b> прибыль по продаже = продажа (с учётом комиссии) минус себестоимость USDT. Пополнения и выводы не считаются доходом. Это внутренний расчёт по записям приложения, а не налоговая декларация: сверьте его с бухгалтером.</p>
-<div class="actions noprint"><button id="rep_pr" type="button">Печать / PDF</button><button class="ghost" id="rep_csv" type="button">Скачать CSV</button></div>
-</div>
-</div>
 <div id="sb_bal" hidden>
 <div class="g2" id="bal"></div>
 <div class="card"><h2>Сверка с картой</h2>
@@ -458,9 +855,21 @@ button:focus-visible,summary:focus-visible,.tile:focus-visible,[role=button]:foc
 
 
 <section class="scr" id="t_more" hidden>
-<div class="card"><h2>Оформление</h2><div class="seg"><button data-th="auto">Авто</button><button data-th="light">Светлая</button><button data-th="dark">Тёмная</button></div><label>Цвет акцента</label><div class="sw" id="sw"></div>
-<label style="margin-top:10px">Свой цвет — выберите или введите код</label>
-<div class="row"><input type="color" id="acc_c" value="#41618f" aria-label="Свой цвет"><input id="acc_h" placeholder="#RRGGBB" maxlength="7" autocapitalize="off" spellcheck="false"></div></div>
+<div class="card" id="pairCard"><h2>Валютная пара</h2><div class="pairs" id="pairs"></div><p class="hint">Учёт ведётся отдельно для каждой пары. Выбранная пара показана в заголовке и во всех суммах.</p></div>
+<div class="card" id="lookCard"><h2>Оформление</h2>
+<div class="thpick" id="thpick">
+<button type="button" data-th="auto"><span class="pv pva"><i></i><b></b></span><span>Авто</span></button>
+<button type="button" data-th="light"><span class="pv pvl"><i></i><b></b></span><span>Светлая</span></button>
+<button type="button" data-th="dark"><span class="pv pvd"><i></i><b></b></span><span>Тёмная</span></button>
+</div>
+<div class="tgr" style="margin-top:6px"><span>Живой фон и переливы</span><button type="button" class="tgl on" id="fxT" role="switch" aria-checked="true" aria-label="Живой фон и переливы"></button></div>
+<label style="margin-top:12px">Цвет акцента</label><div class="sw" id="sw"></div>
+<label style="margin-top:12px">Свой цвет — выберите или введите код</label>
+<div class="row"><input type="color" id="acc_c" value="#41618f" aria-label="Свой цвет"><input id="acc_h" placeholder="#RRGGBB" maxlength="7" autocapitalize="off" spellcheck="false"></div>
+<div class="sliderow" style="margin-top:14px"><div class="tgr" style="border:0;padding:0 0 4px"><span>Плотность стекла</span><b id="glo_v" class="mut" style="font-size:12px"></b></div><input type="range" id="glo_r" min="20" max="150" step="1" aria-label="Плотность стекла"></div>
+<div class="sliderow" style="margin-top:12px"><div class="tgr" style="border:0;padding:0 0 4px"><span>Размытие стекла</span><b id="glb_v" class="mut" style="font-size:12px"></b></div><input type="range" id="glb_r" min="8" max="40" step="1" aria-label="Размытие стекла"></div>
+<p class="hint" style="margin:10px 0 0"><button class="ghost" id="look_def" type="button">Вернуть настройки стекла по умолчанию</button></p>
+</div>
 <div class="card"><div class="head"><h2>Что показывать на экране</h2><button class="ghost" id="ui_all" type="button">Показать всё</button></div><div id="uiList"></div><p class="hint">Скрытое не удаляется: данные остаются, блок просто не показывается. Настройка хранится на этом устройстве.</p></div>
 <div class="card"><h2>Стартовый баланс П2П</h2>
 <div class="row">
@@ -482,6 +891,15 @@ button:focus-visible,summary:focus-visible,.tile:focus-visible,[role=button]:foc
 <textarea id="bk" placeholder="Здесь появится текст копии. Для восстановления вставьте его сюда."></textarea>
 <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px"><button id="bk_show">Показать</button><button class="ghost" id="bk_copy">Скопировать</button><button class="ghost" id="bk_load">Восстановить</button><button class="ghost" id="bk_csv">Скачать CSV</button></div>
 <p class="hint" id="bk_msg"></p>
+</details>
+<details class="card" id="tgCard"><summary>Telegram-бот</summary>
+<p class="hint" style="margin:0 0 8px">Создайте своего бота через @BotFather и вставьте токен. Пришлите боту сообщения сделок из биржевого бота (или перешлите их в чат с ним) — приложение раз в 20 секунд само подхватит новые и предложит добавить. Токен хранится только в этом браузере.</p>
+<label>Токен бота</label><input id="tg_t" placeholder="123456:ABC-..." autocapitalize="off" spellcheck="false" autocomplete="off">
+<label style="margin-top:8px">Chat ID (необязательно — чтобы читать только ваш чат)</label><input id="tg_c" placeholder="123456789" inputmode="numeric">
+<div class="tgr" style="margin-top:8px"><span>Слушать сообщения</span><button type="button" class="tgl" id="tg_on" role="switch" aria-checked="false" aria-label="Слушать сообщения"></button></div>
+<p class="hint" id="tg_s">Выключено</p>
+<div id="tg_l" style="margin-top:8px"></div>
+<div class="actions"><button id="tg_a" type="button" disabled>Добавить все</button><button class="ghost" id="tg_clear" type="button">Сбросить журнал</button></div>
 </details>
 <button id="reset" class="danger" style="width:100%">Начать учёт заново</button>
 <p class="hint" style="text-align:center;margin:14px 0 0">by qkumori</p>
@@ -673,6 +1091,9 @@ const I18N=[
 ['Не хватает','Бракує','Short by'],
 ['Все сделки','Усі угоди','All deals'],
 ['Раздел TON','Розділ TON','TON section'],
+['Валютная пара','Валютна пара','Currency pair'],
+['Учёт ведётся отдельно для каждой пары. Выбранная пара показана в заголовке и во всех суммах.','Облік ведеться окремо для кожної пари. Обрана пара показана в заголовку та в усіх сумах.','Each pair is tracked separately. The selected pair is shown in the title and in all amounts.'],
+['Живой фон и переливы','Живий фон і переливи','Live background and shimmer'],
 ['П2П','P2P','P2P'],
 ['Месяц','Місяць','Month'],
 ['Налоговый отчёт','Податковий звіт','Tax report'],
@@ -697,23 +1118,31 @@ const I18N=[
 ['Отменить','Скасувати','Undo'],
 ['Действие отменено','Дію скасовано','Action undone'],
 ['Периоды','Періоди','Periods'],
-['Налоги','Податки','Taxes'],
+['Плотность стекла','Щільність скла','Glass density'],
+['Размытие стекла','Розмиття скла','Glass blur'],
+['Вернуть настройки стекла по умолчанию','Повернути налаштування скла за замовчуванням','Reset glass settings'],
+['Стекло по умолчанию','Скло за замовчуванням','Default glass'],
+['нет соединения','немає з’єднання','no connection'],
 ];
-let TR=null;
+let TR=null;const _trc={};
 function tr(v){
   if(LANG==='ru')return v;
   if(!TR){const m={};I18N.forEach(a=>{if(!m[a[0]])m[a[0]]=a});const L='А-Яа-яЁёІіЇїЄєҐґ',ks=Object.keys(m).sort((a,b)=>b.length-a.length).map(k=>k.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'));TR={m,re:new RegExp('(^|[^'+L+'])('+ks.join('|')+')(?!['+L+'])','g')}}
-  const i=LANG==='uk'?1:2;return v.replace(TR.re,(_,p,k)=>p+TR.m[k][i]);
+  const c=_trc[LANG]||(_trc[LANG]=new Map());let r=c.get(v);
+  if(r===undefined){const i=LANG==='uk'?1:2;r=v.replace(TR.re,(_,p,k)=>p+TR.m[k][i]);if(c.size>3000)c.clear();c.set(v,r)}
+  return r;
 }
 
 let addTon=false;
-let lastStr=null,undoStk=[],undoing=false,bkPer='all',bkSort='p',repQ=0,repLast=null;
+let lastStr=null,undoStk=[],undoing=false,bkPer='all',bkSort='p';
 let ref=null,editId=null,span=7,tab='home',sub='days',flt='all',rps=7,tflt='all',qs='';
+let tLim=60,dLim=45,_tSig='';
 const num=v=>{const n=parseFloat(String(v).replace(/\s/g,'').replace(',','.'));return isFinite(n)?n:0};
-const fm=(n,d=2)=>n.toLocaleString('ru-RU',{minimumFractionDigits:d,maximumFractionDigits:d});
-const fu=n=>n.toLocaleString('ru-RU',{minimumFractionDigits:2,maximumFractionDigits:6});
+const _nf={},_nfu=new Intl.NumberFormat('ru-RU',{minimumFractionDigits:2,maximumFractionDigits:6});
+const fm=(n,d=2)=>(_nf[d]||(_nf[d]=new Intl.NumberFormat('ru-RU',{minimumFractionDigits:d,maximumFractionDigits:d}))).format(n);
+const fu=n=>_nfu.format(n);
 const fd=s=>s.split('-').reverse().join('.');
-const iso=d=>d.toLocaleDateString('sv-SE');
+const _z2=n=>n<10?'0'+n:''+n,iso=d=>d.getFullYear()+'-'+_z2(d.getMonth()+1)+'-'+_z2(d.getDate());
 const today=()=>iso(new Date());
 const cls=n=>n>0.005?'pos':n<-0.005?'neg':'';
 const sg=n=>(n>0.005?'+':'')+fm(n);
@@ -895,13 +1324,13 @@ function render(){
   const lim=n=>{const z=new Date();z.setDate(z.getDate()-n);return iso(z)};
   const fa=flt==='today'?t:flt==='7'?lim(6):flt==='30'?lim(29):'',inR=d=>!fa||d>=fa,E='<div class="empty">Нет сделок</div>';
   const D=[...c.days].reverse(),mx=Math.max(1,...D.map(d=>Math.abs(d.p)));
-  $('days').innerHTML=D.length?D.map(d=>`<div class="li"><div class="l1"><b>${fd(d.d)}</b><span class="dr"><b class="${cls(d.p)}">${sg(d.p)} UAH</b><button class="ghost x" data-day="${d.d}" aria-label="Очистить день">×</button></span></div><div class="mb"><i style="width:${Math.round(Math.abs(d.p)/mx*100)}%;background:var(${d.p<0?'--neg':'--pos'})"></i></div><div class="dg">${d.bs?`<div><small>Куплено</small><b class="cb">${fu(d.bs)} USDT</b><em>${fm(d.bu)} UAH</em></div>`:''}${d.ss?`<div><small>Продано</small><b class="cg">${fu(d.ss)} USDT</b><em>${fm(d.su)} UAH</em></div>`:''}${d.fc?`<div><small>Комиссия</small><b class="ca">${fm(d.fc)}</b><em>UAH</em></div>`:''}${d.dc?`<div><small>Скидка</small><b class="ca">${fm(d.dc)}</b><em>UAH</em></div>`:''}<div><small>Всего</small><b class="${cls(d.c)}">${sg(d.c)}</b><em>UAH</em></div></div></div>`).join(''):E;
+  $('days').innerHTML=D.length?D.slice(0,dLim).map(d=>`<div class="li"><div class="l1"><b>${fd(d.d)}</b><span class="dr"><b class="${cls(d.p)}">${sg(d.p)} UAH</b><button class="ghost x" data-day="${d.d}" aria-label="Очистить день">×</button></span></div><div class="mb"><i style="width:${Math.round(Math.abs(d.p)/mx*100)}%;background:var(${d.p<0?'--neg':'--pos'})"></i></div><div class="dg">${d.bs?`<div><small>Куплено</small><b class="cb">${fu(d.bs)} USDT</b><em>${fm(d.bu)} UAH</em></div>`:''}${d.ss?`<div><small>Продано</small><b class="cg">${fu(d.ss)} USDT</b><em>${fm(d.su)} UAH</em></div>`:''}${d.fc?`<div><small>Комиссия</small><b class="ca">${fm(d.fc)}</b><em>UAH</em></div>`:''}${d.dc?`<div><small>Скидка</small><b class="ca">${fm(d.dc)}</b><em>UAH</em></div>`:''}<div><small>Всего</small><b class="${cls(d.c)}">${sg(d.c)}</b><em>UAH</em></div></div></div>`).join('')+(D.length>dLim?`<button type="button" class="ghost more" id="dMore">Показать ещё (${D.length-dLim})</button>`:''):E;
   const M={};c.days.forEach(d=>{const k=d.d.slice(0,7),m=M[k]||(M[k]={p:0,fc:0,dc:0,ss:0});m.p+=d.p;m.fc+=d.fc;m.dc+=d.dc;m.ss+=d.ss});
   const ks=Object.keys(M).sort().reverse();
   $('months').innerHTML=ks.length?ks.map(k=>{const m=M[k];return `<div class="li"><div class="l1"><b>${MN[+k.slice(5)-1]} ${k.slice(0,4)}</b><b class="${cls(m.p)}">${sg(m.p)} UAH</b></div><div class="l2"><span class="cg">Продано ${fu(m.ss)} USDT</span>${m.fc?`<span class="ca">Комиссия ${fm(m.fc)}</span>`:''}${m.dc?`<span class="ca">Скидка ${fm(m.dc)}</span>`:''}</div></div>`}).join(''):E;
   const grp=key=>{const g={};c.T.forEach(x=>{if(x.t!=='b'&&x.t!=='s')return;const k=x[key]||'Не указан',o=g[k]||(g[k]={n:0,v:0,p:0});o.n++;o.v+=x.s;o.p+=c.pm[x.id]||0});return Object.entries(g).sort((a,b)=>b[1].p-a[1].p||b[1].n-a[1].n).slice(0,12)};
   const gl=a=>a.length?a.map(([k,o])=>`<div class="li"><div class="l1"><b>${esc(k)}</b><b class="${cls(o.p)}">${sg(o.p)} UAH</b></div><div class="l2"><span>${o.n} сделок</span><span>${fu(o.v)} USDT</span></div></div>`).join(''):E;
-  renderBanks(c);renderCmp(c);renderRep(c);
+  renderBanks(c);renderCmp(c);
   const opt=key=>{const m={};c.T.forEach(x=>{if(x[key])m[x[key]]=(m[x[key]]||0)+1});return Object.entries(m).sort((a,b)=>b[1]-a[1]).slice(0,30).map(([k])=>`<option value="${esc(k)}">`).join('')};
   $('dl_k').innerHTML=opt('k');$('dl_c').innerHTML=opt('c');
   $('recentH').innerHTML=recentHtml(c,5);$('recentA').innerHTML=recentHtml(c,8);
@@ -921,7 +1350,9 @@ function render(){
     return `<div class="li"><div class="l1"><span><span class="chip" style="--c:var(${s?'--vio':'--blue'})">${s?'Продажа':'Покупка'}</span>${x.n?` <b class="mut">#${x.n}</b>`:''}${TID.has(x.id)?' <span class="chip" style="--c:var(--amber)">TON</span>':''}</span>${btn(x)}</div><div class="l2">${pc}<span><b style="color:var(--tx)">${fu(x.s)} USDT</b> ${s?'→':'←'} <b style="color:var(--tx)">${fm(x.u)} UAH</b></span><span>курс ${x.s?fm(r,4):'—'}</span><span>факт ${x.s?fm(x.u/x.s,4):'—'}</span>${ex}${x.k?`<span>${esc(x.k)}</span>`:''}${x.c?`<span>${esc(x.c)}</span>`:''}</div></div>`};
   const dI={},dN={};c.days.forEach(z=>dI[z.d]=z);T.forEach(x=>dN[x.d]=(dN[x.d]||0)+1);
   const hdrH=d=>`<div class="dh"><b>${fd(d)}</b><span>${dN[d]} записей</span>${dI[d]?`<b class="sp ${cls(dI[d].p)}">${sg(dI[d].p)} UAH</b>`:''}</div>`;
-  $('trades').innerHTML=T.length?T.map((x,k)=>(k===0||T[k-1].d!==x.d?hdrH(x.d):'')+rowH(x)).join(''):E;
+  const _sg=flt+'|'+tflt+'|'+qs+'|'+state.cur;if(_sg!==_tSig){_tSig=_sg;tLim=60;dLim=45}
+  const TL=Math.min(T.length,tLim);
+  $('trades').innerHTML=T.length?T.slice(0,TL).map((x,k)=>(k===0||T[k-1].d!==x.d?hdrH(x.d):'')+rowH(x)).join('')+(T.length>TL?`<button type="button" class="ghost more" id="tMore">Показать ещё (${T.length-TL})</button>`:''):E;
   renderTurn(c);renderTpl();renderCalc(c);renderTon(c);
 }
 async function save(){
@@ -1033,7 +1464,7 @@ $('cancel').onclick=()=>{stopEdit();showTab('hist')};
 $('saveStart').onclick=()=>{setSt({uah:num($('s_uah').value),usdt:num($('s_usdt').value),rate:num($('s_rate').value)});render();save()};
 $('g_g').onchange=()=>{setGl(num($('g_g').value));render();save()};
 function showTab(t){tab=t;document.querySelectorAll('.scr').forEach(s=>s.hidden=s.id!=='t_'+t);document.querySelectorAll('[data-tab]').forEach(b=>b.classList.toggle('on',b.dataset.tab===t));document.querySelectorAll('.scr').forEach(s=>s.scrollTop=0)}
-function showSub(s){sub=s;['days','months','rates','bal','bk','turn','cmp','rep'].forEach(k=>$('sb_'+k).hidden=k!==s);document.querySelectorAll('[data-sub]').forEach(b=>b.classList.toggle('on',b.dataset.sub===s))}
+function showSub(s){sub=s;['days','months','rates','bal','bk','turn','cmp'].forEach(k=>$('sb_'+k).hidden=k!==s);document.querySelectorAll('[data-sub]').forEach(b=>b.classList.toggle('on',b.dataset.sub===s))}
 function showFlt(f){flt=f;document.querySelectorAll('[data-flt]').forEach(b=>b.classList.toggle('on',b.dataset.flt===f));render()}
 document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>showTab(b.dataset.tab));
 document.querySelectorAll('[data-sub]').forEach(b=>b.onclick=()=>showSub(b.dataset.sub));
@@ -1089,7 +1520,7 @@ $('qa').onclick=e=>{
   setTimeout(()=>{const f=$(b.dataset.q==='i'||b.dataset.q==='o'?'f_u':'f_s');if(f)f.focus()},60);
 };
 document.querySelectorAll('[data-tf]').forEach(b=>b.onclick=()=>{tflt=b.dataset.tf;document.querySelectorAll('[data-tf]').forEach(x=>x.classList.toggle('on',x===b));render()});
-$('q').oninput=()=>{qs=$('q').value.trim().toLowerCase();render()};
+let _qT=0;$('q').oninput=()=>{clearTimeout(_qT);_qT=setTimeout(()=>{qs=$('q').value.trim().toLowerCase();render()},150)};
 $('t_add').addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.tagName==='INPUT'&&!e.target.closest('#cc')&&!e.target.closest('#tonBody'))$('add').click()});
 function exportCsv(){
   const c=calc(),nm={b:'buy',s:'sell',i:'deposit',o:'withdrawal',r:'rate_adjustment'};
@@ -1108,7 +1539,7 @@ function exportCsv(){
   $('bk_msg').textContent='Файл CSV сохранён ('+c.T.length+' записей). Разделитель — «;», открывается в Excel.';
 }
 $('bk_csv').onclick=exportCsv;
-$('rc_v').oninput=render;$('wi_r').oninput=render;
+let _rcT=0,_wiT=0;$('rc_v').oninput=()=>{clearTimeout(_rcT);_rcT=setTimeout(render,250)};$('wi_r').oninput=()=>{clearTimeout(_wiT);_wiT=setTimeout(render,250)};
 document.querySelectorAll('[data-rp]').forEach(b=>b.onclick=()=>{rps=+b.dataset.rp;document.querySelectorAll('[data-rp]').forEach(x=>x.classList.toggle('on',x===b));render()});
 $('rp_c').onclick=async()=>{try{await navigator.clipboard.writeText($('rp').value);$('rp_m').textContent='Скопировано'}catch(e){$('rp').select();$('rp_m').textContent='Текст выделен — скопируйте'}};
 $('rc_b').onclick=()=>{
@@ -1117,11 +1548,13 @@ $('rc_b').onclick=()=>{
 };
 document.querySelectorAll('[data-span]').forEach(b=>b.onclick=()=>{span=+b.dataset.span;document.querySelectorAll('[data-span]').forEach(x=>x.classList.toggle('on',x===b));render()});
 $('trades').onclick=e=>{
+  if(e.target.id==='tMore'){tLim+=100;render();return}
   const ds=e.target.dataset||{};
   if(ds.edit){startEdit(Number(ds.edit));return}
   if(ds.id)ask('Удалить эту запись?'+delWarn(state.trades.filter(x=>String(x.id)!==ds.id)),()=>{state.trades=state.trades.filter(x=>String(x.id)!==ds.id);if(String(editId)===ds.id)stopEdit();render();save()});
 };
 $('days').onclick=e=>{
+  if(e.target.id==='dMore'){dLim+=90;render();return}
   const d=e.target.dataset&&e.target.dataset.day;
   if(d)ask('Удалить все сделки за '+fd(d)+'? Прибыль за этот день обнулится.'+delWarn(state.trades.filter(x=>!(x.d===d&&(x.p||'UAH')===state.cur))),()=>{state.trades=state.trades.filter(x=>!(x.d===d&&(x.p||'UAH')===state.cur));stopEdit();render();save()});
 };
@@ -1414,13 +1847,22 @@ document.querySelectorAll('[data-acc]').forEach(b=>b.onclick=()=>{accent=b.datas
 $('thm').onclick=()=>{theme=isDark()?'light':'dark';setPref('p2p_theme',theme);applyTheme()};
 if(mq&&mq.addEventListener)mq.addEventListener('change',()=>{if(theme==='auto')applyTheme()});
 function setCustom(h){customHex=h.toLowerCase();accent='custom';setPref('p2p_accent','custom');setPref('p2p_accent_hex',customHex);applyTheme()}
-$('acc_c').oninput=()=>{$('acc_h').value=$('acc_c').value;setCustom($('acc_c').value)};
+/* выбор цвета: пока тянете палитру — только быстро обновляем переменные на body (без перезаписи поля, без сохранения и без плавных переходов по всей странице); фиксируем, когда палитру закрыли */
+(function(){
+  const c=$('acc_c'),h=$('acc_h'),bs=document.body.style;let raf=0,val='',tmr=0;
+  const live=()=>{raf=0;const pa=accent,ph=customHex;accent='custom';customHex=val.toLowerCase();const a=accOf(),dk=isDark();accent=pa;customHex=ph;
+    bs.setProperty('--ac',dk?a[2]:a[1]);bs.setProperty('--acb',a[3]);bs.setProperty('--acf',lumOf(a[3])>.62?'#111':'#fff')};
+  const done=()=>{cancelAnimationFrame(raf);raf=0;clearTimeout(tmr);['--ac','--acb','--acf'].forEach(k=>bs.removeProperty(k));document.body.classList.remove('gdrag')};
+  c.addEventListener('input',()=>{val=c.value;h.value=val;document.body.classList.add('gdrag');clearTimeout(tmr);tmr=setTimeout(()=>document.body.classList.remove('gdrag'),400);if(!raf)raf=requestAnimationFrame(live)});
+  const commit=()=>{if(!val)return;const v=val;val='';done();setCustom(v)};
+  c.addEventListener('change',commit);c.addEventListener('blur',commit);
+})();
 $('acc_h').oninput=()=>{let v=$('acc_h').value.trim();if(v&&v[0]!=='#')v='#'+v;if(/^#[0-9a-f]{6}$/i.test(v)){$('acc_c').value=v.toLowerCase();setCustom(v)}};
 $('acc_h').onblur=()=>applyTheme();
 const UIB=[
 ['Главная',[['hero','Прибыль сегодня','.hero'],['qa','Быстрые кнопки','#qa'],['stats','Плитки: баланс и курсы','#hstats'],['goal','Цель на день','#goalCard'],['chart','График','.chc'],['recH','Последние записи','#recentH']]],
 ['Сделка',[['tonform','Тип «TON»','.seg button[data-t="ton"]'],['tpl','Шаблоны','#tplw'],['paste','Вставка сообщения из бота','#pst'],['bank','Банк и контрагент','#wx'],['again','Повтор прошлой сделки','#again'],['imp','Массовый импорт','#imp'],['cc','Калькулятор','#cc'],['recA','Последние записи','#recentA']]],
-['Итоги',[['s_months','Месяцы','[data-sub="months"]'],['s_rates','Курсы','[data-sub="rates"]'],['s_bal','Баланс','[data-sub="bal"]'],['s_bk','Банки','[data-sub="bk"]'],['s_turn','Оборот','[data-sub="turn"]'],['s_cmp','Периоды','[data-sub="cmp"]'],['s_rep','Налоги','[data-sub="rep"]']]],
+['Итоги',[['s_months','Месяцы','[data-sub="months"]'],['s_rates','Курсы','[data-sub="rates"]'],['s_bal','Баланс','[data-sub="bal"]'],['s_bk','Банки','[data-sub="bk"]'],['s_turn','Оборот','[data-sub="turn"]'],['s_cmp','Периоды','[data-sub="cmp"]']]],
 ['Сделки',[['tontab','Раздел TON','#hv_seg']]]
 ];
 let UIH={};try{UIH=JSON.parse(localStorage.getItem('p2p_ui')||'{}')||{}}catch(e){}
@@ -1452,11 +1894,35 @@ window.cloudLoad=async function(r){
 window.cloudOff=function(){ref=null;$('st').textContent='· данные в браузере'};
 $('pairs').innerHTML=CURS.map(c=>`<button type="button" data-cur="${c}" aria-label="USDT/${c}">${SYM[c]} ${c}</button>`).join('');
 $('pairs').onclick=e=>{const b=e.target.closest('[data-cur]');if(!b||b.dataset.cur===state.cur)return;state.cur=b.dataset.cur;leaveTon();stopEdit();render();save()};
+/* перевод/валюта: полный обход страницы только при смене языка или валюты; при обычных обновлениях — только новые узлы */
+const _ctSkip={SCRIPT:1,STYLE:1,TEXTAREA:1};
+let _ctKey='',_ctD=[],_ctQ=0,_ctMO=null;
+const _ctText=(n,C0)=>{if(n.__o===undefined)n.__o=n.nodeValue;const v=tr(n.__o).replace(/UAH/g,C0);if(n.nodeValue!==v)n.nodeValue=v};
+const _ctPh=(e,C0)=>{if(e.dataset.o===undefined)e.dataset.o=e.placeholder;const v=tr(e.dataset.o).replace(/UAH/g,C0);if(e.placeholder!==v)e.placeholder=v};
+function _ctWalk(root,C0){
+  if(root.nodeType===3){const p=root.parentNode;if(p&&!_ctSkip[p.nodeName]&&!(p.closest&&p.closest('#pairs')))_ctText(root,C0);return}
+  if(root.nodeType!==1||_ctSkip[root.nodeName]||(root.closest&&root.closest('#pairs')))return;
+  const w=document.createTreeWalker(root,NodeFilter.SHOW_ELEMENT|NodeFilter.SHOW_TEXT,{acceptNode:n=>n.nodeType===1?(_ctSkip[n.nodeName]||n.id==='pairs'?NodeFilter.FILTER_REJECT:NodeFilter.FILTER_SKIP):NodeFilter.FILTER_ACCEPT});
+  let n;while(n=w.nextNode())_ctText(n,C0);
+  if(root.hasAttribute('placeholder'))_ctPh(root,C0);
+  root.querySelectorAll('[placeholder]').forEach(e=>_ctPh(e,C0));
+}
+function _ctCollect(rs){
+  for(const r of rs){
+    if(r.type==='characterData'){r.target.__o=undefined;_ctD.push(r.target)}
+    else r.addedNodes.forEach(n=>{if(n.nodeType===1||n.nodeType===3)_ctD.push(n)});
+  }
+}
 function curText(){
-  const C0=state.cur,w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT,{acceptNode:n=>{const p=n.parentNode;return(p&&/^(SCRIPT|STYLE|TEXTAREA)$/.test(p.nodeName))||(p&&p.closest&&p.closest('#pairs'))?NodeFilter.FILTER_REJECT:NodeFilter.FILTER_ACCEPT}});
-  let n;while(n=w.nextNode()){if(n.__o===undefined)n.__o=n.nodeValue;const v=tr(n.__o).replace(/UAH/g,C0);if(n.nodeValue!==v)n.nodeValue=v}
-  document.querySelectorAll('[placeholder]').forEach(e=>{if(e.dataset.o===undefined)e.dataset.o=e.placeholder;const v=tr(e.dataset.o).replace(/UAH/g,C0);if(e.placeholder!==v)e.placeholder=v});
+  const C0=state.cur,key=LANG+'|'+C0,calm=LANG==='ru'&&C0==='UAH';
+  if(_ctMO){const r=_ctMO.takeRecords();if(r.length)_ctCollect(r)}
+  if(key!==_ctKey){
+    const first=_ctKey==='';_ctKey=key;_ctD=[];
+    if(!(first&&calm))_ctWalk(document.body,C0);
+  }else if(!calm&&_ctD.length){const d=_ctD;_ctD=[];d.forEach(n=>{if(n.isConnected)_ctWalk(n,C0)})}
+  else _ctD=[];
   document.title='USDT/'+C0+' — '+tr('учёт прибыли');
+  if(_ctMO)_ctMO.takeRecords();
 }
 const LN={uk:'Українська',ru:'Русский',en:'English'};
 $('lm').innerHTML=Object.entries(LN).map(([k,v])=>`<button type="button" data-l="${k}">${v}</button>`).join('');
@@ -1465,7 +1931,10 @@ $('lng').onclick=e=>{e.stopPropagation();$('lm').hidden=!$('lm').hidden};
 $('lm').onclick=e=>{const b=e.target.closest('[data-l]');if(!b)return;LANG=b.dataset.l;try{localStorage.setItem('p2p_lang',LANG)}catch(x){}markLang();render();curText()};
 document.addEventListener('click',()=>{$('lm').hidden=true});
 markLang();
-let cq=0;new MutationObserver(()=>{if(cq)return;cq=1;queueMicrotask(()=>{cq=0;curText()})}).observe(document.body,{childList:true,subtree:true,characterData:true});
+_ctMO=new MutationObserver(rs=>{
+  if(LANG==='ru'&&state.cur==='UAH'&&_ctKey==='ru|UAH')return;
+  _ctCollect(rs);if(_ctQ)return;_ctQ=1;setTimeout(()=>{_ctQ=0;curText()},150)});
+_ctMO.observe(document.body,{childList:true,subtree:true,characterData:true});
 render();curText();
 setTimeout(()=>{const o=$('pairs').querySelector('.on');if(o)$('pairs').scrollLeft=Math.max(0,o.offsetLeft-60)},50);
 
@@ -1531,45 +2000,6 @@ function renderBanks(c){
 document.querySelectorAll('[data-bkp]').forEach(b=>b.onclick=()=>{bkPer=b.dataset.bkp;document.querySelectorAll('[data-bkp]').forEach(x=>x.classList.toggle('on',x===b));render()});
 document.querySelectorAll('[data-bks]').forEach(b=>b.onclick=()=>{bkSort=b.dataset.bks;document.querySelectorAll('[data-bks]').forEach(x=>x.classList.toggle('on',x===b));render()});
 function rsum(a,f){return a.reduce((s,x)=>s+f(x),0)}
-function renderRep(c){
-  const ys=new Set([new Date().getFullYear()]);c.T.forEach(x=>ys.add(+x.d.slice(0,4)));
-  const yrs=[...ys].sort((a,b)=>b-a).map(String);
-  const sel=$('rep_y');
-  if(sel.dataset.k!==yrs.join()){const cur=sel.value;sel.innerHTML=yrs.map(y=>`<option>${y}</option>`).join('');sel.dataset.k=yrs.join();sel.value=yrs.includes(cur)?cur:yrs[0]}
-  const Y=sel.value||yrs[0];
-  document.querySelectorAll('[data-rq]').forEach(x=>x.classList.toggle('on',+x.dataset.rq===repQ));
-  const ms=repQ?[1,2,3].map(i=>(repQ-1)*3+i):[1,2,3,4,5,6,7,8,9,10,11,12];
-  const rows=ms.map(m=>{
-    const k=Y+'-'+String(m).padStart(2,'0');
-    const T=c.T.filter(x=>x.d.slice(0,7)===k),B=T.filter(x=>x.t==='b'),S=T.filter(x=>x.t==='s');
-    return{m,nb:B.length,bs:rsum(B,x=>x.s),bu:rsum(B,x=>x.u),dc:rsum(B,x=>x.b?x.b-x.u:0),ns:S.length,ss:rsum(S,x=>x.s),su:rsum(S,x=>gr(x)),fc:rsum(S,x=>gr(x)-x.u),p:rsum(S,x=>c.pm[x.id]||0),dep:rsum(T.filter(x=>x.t==='i'),x=>x.u),wd:rsum(T.filter(x=>x.t==='o'),x=>x.u)};
-  });
-  const tot={};['nb','bs','bu','dc','ns','ss','su','fc','p','dep','wd'].forEach(k=>tot[k]=rsum(rows,r=>r[k]));
-  const cols=[['nb','n'],['bs','u'],['bu','m'],['ns','n'],['ss','u'],['su','m'],['fc','m'],['dc','m']];
-  const fmt={n:v=>v||'—',u:v=>v?fu(v):'—',m:v=>v?fm(v):'—'};
-  const cells=(r,isTot)=>cols.map(([k,t])=>`<td>${fmt[t](r[k])}</td>`).join('')+`<td class="${cls(r.p)}">${(r.nb||r.ns)?sg(r.p):'—'}</td>`;
-  const head='<tr><th>Месяц</th><th>Покупок</th><th>USDT</th><th>UAH</th><th>Продаж</th><th>USDT</th><th>UAH</th><th>Комиссия</th><th>Скидка</th><th>Прибыль</th></tr>';
-  $('rep_t').innerHTML=`<table><thead>${head}</thead><tbody>${rows.map(r=>`<tr><td>${MN[r.m-1]}</td>${cells(r)}</tr>`).join('')}</tbody><tfoot><tr><th>Итого</th>${cells(tot)}</tr></tfoot></table>`;
-  $('rep_s').textContent=`За период: пополнений ${fm(tot.dep)} UAH · выводов ${fm(tot.wd)} UAH · прибыль по продажам ${sg(tot.p)} UAH`;
-  repLast={Y,rows,tot};
-}
-$('rep_y').onchange=()=>render();
-document.querySelectorAll('[data-rq]').forEach(b=>b.onclick=()=>{repQ=+b.dataset.rq;render()});
-$('rep_pr').onclick=()=>window.print();
-$('rep_csv').onclick=()=>{
-  if(!repLast)return;
-  const n=v=>(v===0||v==null?'':String(+(+v).toFixed(2)).replace('.',','));
-  const head=['Месяц','Покупок','Куплено USDT','Куплено UAH','Скидка UAH','Продаж','Продано USDT','Продано UAH','Комиссия UAH','Прибыль UAH'];
-  const line=r=>[r.m!=null?MN[r.m-1]:'Итого',r.nb,n(r.bs),n(r.bu),n(r.dc),r.ns,n(r.ss),n(r.su),n(r.fc),n(r.p)];
-  const rows=[head,...repLast.rows.map(line),line(Object.assign({},repLast.tot,{m:null}))];
-  const csv='﻿'+rows.map(r=>r.map(v=>'"'+String(v==null?'':v).replace(/"/g,'""')+'"').join(';')).join('\r\n');
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
-  a.download='tax_USDT_'+repLast.Y+(repQ?'_Q'+repQ:'')+'.csv';
-  document.body.appendChild(a);a.click();a.remove();
-  setTimeout(()=>URL.revokeObjectURL(a.href),2000);
-};
-
 /* ===== iOS-анимации и мелочи ===== */
 (function(){
   const root=document.documentElement,mainEl=document.querySelector('main'),reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -1584,8 +2014,8 @@ $('rep_csv').onclick=()=>{
     t.style.transform='translate('+on.offsetLeft+'px,'+on.offsetTop+'px)';t.style.opacity=1;
     if(!t.classList.contains('ready'))requestAnimationFrame(()=>requestAnimationFrame(()=>t.classList.add('ready')));
   };
-  let q=0;const sched=()=>{if(q)return;q=requestAnimationFrame(()=>{q=0;boxes.forEach(place)})};
-  new MutationObserver(sched).observe(document.body,{attributes:true,attributeFilter:['class','hidden'],subtree:true});
+  let q=0,kT=0;const sched=()=>{clearTimeout(kT);kT=setTimeout(()=>{cancelAnimationFrame(q);q=requestAnimationFrame(()=>{boxes.forEach(place)})},120)};
+  new MutationObserver(ms=>{if(ms.some(m=>m.target.tagName==='BUTTON'||(m.target.classList&&m.target.classList.contains('scr'))))sched()}).observe(document.body,{attributes:true,attributeFilter:['class','hidden'],subtree:true});
   if(window.ResizeObserver){const ro=new ResizeObserver(sched);boxes.forEach(b=>ro.observe(b))}
   addEventListener('resize',sched);if(document.fonts&&document.fonts.ready)document.fonts.ready.then(sched);sched();
   /* 2. лёгкая вибрация на тапах (где поддерживается) и флаг «прорисовать график» */
@@ -1597,13 +2027,8 @@ $('rep_csv').onclick=()=>{
   const ch=document.getElementById('chart');
   if(ch)new MutationObserver(()=>{const v=ch.querySelector('svg');if(chartEnter&&v){chartEnter=false;v.classList.add('enter')}}).observe(ch,{childList:true});
   /* 3. экраны сдвигаются в сторону выбранной вкладки */
-  const ordT=['home','add','hist','stat','more'],_showTab=showTab;
-  showTab=function(t){
-    const a=ordT.indexOf(tab),b=ordT.indexOf(t);
-    if(mainEl)mainEl.style.setProperty('--dx',(b>=a?1:-1)*26+'px');
-    if(t==='home')chartEnter=true;
-    _showTab(t);
-  };
+  const _showTab=showTab;
+  showTab=function(t){if(t==='home')chartEnter=true;_showTab(t)};
   /* 4. число прибыли «досчитывается» до нового значения */
   const hp=document.getElementById('hp');
   if(hp&&!reduce){
@@ -1640,12 +2065,20 @@ $('rep_csv').onclick=()=>{
   if(window.ResizeObserver)new ResizeObserver(upd).observe(nav);
   upd();setTimeout(upd,300);setTimeout(upd,1200);
 })();
+
+/* ===== v12: Liquid Glass 2 — блик за пальцем, «сжатие» линзы, спокойный режим ===== */
+(function(){
+  const root=document.documentElement;
+  /* спокойный режим */
+  try{if(localStorage.getItem('p2p_fx')==='calm')root.dataset.fx='calm'}catch(e){}
+  const ft=document.getElementById('fxT');
+  const sync=()=>{const on=root.dataset.fx!=='calm';ft.classList.toggle('on',on);ft.setAttribute('aria-checked',on)};
+  ft.onclick=()=>{if(root.dataset.fx==='calm'){delete root.dataset.fx;setPref('p2p_fx','')}else{root.dataset.fx='calm';setPref('p2p_fx','calm')}sync()};
+  sync();
+})();
 </script>
 <script type="module">
-import {initializeApp} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-import {initializeAuth,indexedDBLocalPersistence,browserLocalPersistence,browserPopupRedirectResolver,GoogleAuthProvider,signInWithPopup,signOut,onAuthStateChanged} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
-import {initializeFirestore,doc,getDoc,setDoc} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
-
+/* Firebase подгружается после первой отрисовки (в простое), а не блокирует старт; при нажатии «Вход» — сразу */
 const firebaseConfig = {
   apiKey: "AIzaSyBpdM32vVZOwhfLPoql4EINmgh21bCGdSI",
   authDomain: "p2p-calc-cb.firebaseapp.com",
@@ -1656,48 +2089,222 @@ const firebaseConfig = {
 };
 
 const btn=document.getElementById('auth');
-const app=initializeApp(firebaseConfig);
-// Без popupRedirectResolver при старте: служебная страница Google не грузится, пока вы не нажмёте «Войти»
-const auth=initializeAuth(app,{persistence:[indexedDBLocalPersistence,browserLocalPersistence]});
-const db=initializeFirestore(app,{experimentalAutoDetectLongPolling:true});
-
-// Быстрая подсказка из прошлого визита, пока Firebase проверяет вход
 const hint=(()=>{try{return localStorage.getItem('p2p_user')}catch(e){return null}})();
 btn.hidden=false;
-if(hint){btn.textContent='Выйти ('+hint+')'}
+btn.textContent=hint?'Выйти ('+hint+')':'Вход';
+
+const V='10.14.1',U='https://www.gstatic.com/firebasejs/'+V+'/';
+let fb=null;
+function loadFb(){
+  return fb||(fb=(async()=>{
+    const [A,Au,Fs]=await Promise.all([import(U+'firebase-app.js'),import(U+'firebase-auth.js'),import(U+'firebase-firestore.js')]);
+    const app=A.initializeApp(firebaseConfig);
+    // Без popupRedirectResolver при старте: служебная страница Google не грузится, пока вы не нажмёте «Войти»
+    const auth=Au.initializeAuth(app,{persistence:[Au.indexedDBLocalPersistence,Au.browserLocalPersistence]});
+    const db=Fs.initializeFirestore(app,{experimentalAutoDetectLongPolling:true});
+    Au.onAuthStateChanged(auth,u=>{
+      btn.hidden=false;
+      if(u){
+        const name=u.displayName||u.email||'аккаунт';
+        try{localStorage.setItem('p2p_user',name)}catch(e){}
+        btn.textContent='Выйти ('+name+')';
+        const d=Fs.doc(db,'users',u.uid);
+        window.cloudLoad({
+          get:async()=>{const s=await Fs.getDoc(d);return {exists:s.exists(),data:()=>s.data()}},
+          set:st=>Fs.setDoc(d,JSON.parse(JSON.stringify(st)))
+        });
+      }else{
+        try{localStorage.removeItem('p2p_user')}catch(e){}
+        btn.textContent='Вход';
+        window.cloudOff();
+      }
+    });
+    return {auth,Au};
+  })().catch(e=>{fb=null;throw e}));
+}
 
 let busy=false;
 btn.onclick=async()=>{
   if(busy)return;
-  if(auth.currentUser){await signOut(auth);return}
   busy=true;btn.disabled=true;
-  const p=new GoogleAuthProvider();
-  p.setCustomParameters({prompt:'select_account'});
-  try{await signInWithPopup(auth,p,browserPopupRedirectResolver)}
-  catch(e){
+  try{
+    const {auth,Au}=await loadFb();
+    if(auth.currentUser){await Au.signOut(auth);return}
+    const p=new Au.GoogleAuthProvider();
+    p.setCustomParameters({prompt:'select_account'});
+    await Au.signInWithPopup(auth,p,Au.browserPopupRedirectResolver);
+  }catch(e){
     if(e.code==='auth/popup-blocked')alert(window.tr('Браузер заблокировал окно входа. Разрешите всплывающие окна для этого сайта и нажмите кнопку ещё раз.'));
-    else if(e.code!=='auth/popup-closed-by-user'&&e.code!=='auth/cancelled-popup-request')alert(window.tr('Не удалось войти: '+e.code));
+    else if(e.code!=='auth/popup-closed-by-user'&&e.code!=='auth/cancelled-popup-request')alert(window.tr('Не удалось войти: '+(e.code||'нет соединения')));
   }finally{busy=false;btn.disabled=false}
 };
 
-onAuthStateChanged(auth,u=>{
-  btn.hidden=false;
-  if(u){
-    const name=u.displayName||u.email||'аккаунт';
-    try{localStorage.setItem('p2p_user',name)}catch(e){}
-    btn.textContent='Выйти ('+name+')';
-    const d=doc(db,'users',u.uid);
-    window.cloudLoad({
-      get:async()=>{const s=await getDoc(d);return {exists:s.exists(),data:()=>s.data()}},
-      set:st=>setDoc(d,JSON.parse(JSON.stringify(st)))
-    });
-  }else{
-    try{localStorage.removeItem('p2p_user')}catch(e){}
-    btn.textContent='Войти через Google';
-    window.cloudOff();
-  }
-});
+const start=()=>{loadFb().catch(()=>{})};
+if(hint){start()}   // был вход — подтягиваем облако сразу
+else if('requestIdleCallback' in window)requestIdleCallback(start,{timeout:2500});
+else setTimeout(start,1200);
+</script>
 
+<script>
+/* ===== v13: Telegram-бот ===== */
+
+/* ---------- Telegram-бот: приложение само забирает пересланные сделки ---------- */
+let tgTimer=null,tgOffset=0,tgPending=[];
+try{tgOffset=+(localStorage.getItem('p2p_tg_off')||0)}catch(e){}
+const tgPref=(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}};
+function tgStatus(s,neg){const e=$('tg_s');if(e){e.textContent=s;e.className='hint'+(neg?' neg':'')}}
+function tgRender(){
+  const l=$('tg_l');if(!l)return;
+  l.innerHTML=tgPending.map(x=>{const s=x.t==='s';return '<div class="li"><div class="l1"><span><span class="chip" style="--c:var('+(s?'--vio':'--blue')+')">'+(s?'Продажа':'Покупка')+'</span>'+(x.n?' <span class="mut">#'+esc(x.n)+'</span>':'')+'</span></div><div class="l2"><span><b style="color:var(--tx)">'+fu(x.s)+' USDT</b> '+(s?'→':'←')+' <b style="color:var(--tx)">'+fm(x.u)+' '+(SYM[x.p]||x.p||'UAH')+'</b></span><span>курс '+fm(x.r||x.u/x.s,4)+'</span>'+(x.k?'<span>'+esc(x.k)+'</span>':'')+'</div></div>'}).join('');
+  const fresh=tgPending.filter(x=>!(x.n&&state.trades.some(z=>z.n===x.n))).length;
+  $('tg_a').disabled=!fresh;
+  $('tg_a').textContent='Добавить все'+(fresh?' ('+fresh+')':'');
+}
+async function tgPoll(){
+  const tok=($('tg_t').value||'').trim(),chat=($('tg_c').value||'').trim();
+  if(!tok){tgStatus('Сначала вставьте токен от @BotFather',true);return}
+  let r;
+  try{r=await fetch('https://api.telegram.org/bot'+tok+'/getUpdates?offset='+(tgOffset+1)+'&limit=50').then(x=>x.json())}
+  catch(e){tgStatus('Нет связи с Telegram (проверьте интернет)',true);return}
+  if(!r.ok){tgStatus('Ошибка Telegram: '+(r.description||'проверьте токен'),true);return}
+  let max=tgOffset;
+  r.result.forEach(u=>{
+    max=Math.max(max,u.update_id);
+    const msg=u.message||u.edited_message||u.channel_post;if(!msg||!msg.text)return;
+    if(chat&&String(msg.chat&&msg.chat.id)!==chat)return;
+    if(tgPending.some(p=>p.uid===u.update_id))return;
+    const chunks=/^(?:Покупаете|Прода[её]те)\s*:/im.test(msg.text)?[msg.text]:[];
+    chunks.forEach(ch=>{
+      const pr=parseDeal(ch);
+      if(pr&&pr.s>0&&pr.u>0)tgPending.push(Object.assign({uid:u.update_id},pr));
+    });
+  });
+  if(max>tgOffset){tgOffset=max;tgPref('p2p_tg_off',String(max))}
+  tgRender();
+  if(r.result.length)tgStatus('Подключено · новых сообщений: '+r.result.length+' · журнал до отметки '+max);
+  else tgStatus('Подключено · обновлено '+new Date().toLocaleTimeString());
+}
+function tgStart(){
+  clearInterval(tgTimer);
+  tgPoll();
+  tgTimer=setInterval(tgPoll,20000);
+  $('tg_on').classList.add('on');$('tg_on').setAttribute('aria-checked','true');
+  tgPref('p2p_tg_on','1');
+}
+function tgStop(){
+  clearInterval(tgTimer);tgTimer=null;
+  $('tg_on').classList.remove('on');$('tg_on').setAttribute('aria-checked','false');
+  tgStatus('Выключено');
+  tgPref('p2p_tg_on','');
+}
+$('tg_on').onclick=()=>{tgTimer?tgStop():tgStart()};
+$('tg_t').onchange=()=>{tgPref('p2p_tg_token',$('tg_t').value);if(tgTimer)tgPoll()};
+$('tg_c').onchange=()=>tgPref('p2p_tg_chat',$('tg_c').value);
+$('tg_clear').onclick=()=>{tgOffset=0;tgPref('p2p_tg_off','0');toast('Журнал сброшен — старые сообщения можно забрать заново (дубли отфильтруются по № сделки)')};
+$('tg_a').onclick=()=>{
+  const items=tgPending.filter(x=>!(x.n&&state.trades.some(z=>z.n===x.n)));
+  if(!items.length)return;
+  const base=Date.now();
+  const nt=items.map((x,i)=>({id:base+i+1,d:x.d||today(),t:x.t,p:CURS.includes(x.p)?x.p:state.cur,u:x.u,s:x.s,r:0,f:x.t==='s'?state.fee:0,b:null,n:x.n||'',k:x.k||'',c:x.c||''}));
+  const o=state.cur;let needs=[],bad=false;
+  try{
+    [...new Set(nt.map(x=>x.p))].forEach(p=>{
+      state.cur=p;
+      const g=nt.filter(x=>x.p===p),b=calc(),a=calc([...state.trades,...g]);
+      const dU=defi(a.minUah)-defi(b.minUah),dS=defi(a.minUsdt)-defi(b.minUsdt);
+      if(dS>EPS_S)bad=true;else if(dU>EPS)needs.push({p,u:Math.ceil(dU*100-1e-9)/100,d:g.reduce((m,x)=>x.d<m?x.d:m,g[0].d)});
+    });
+  }finally{state.cur=o}
+  if(bad){tgStatus('Не хватает USDT для части сделок: проверьте даты или стартовый баланс',true);return}
+  const commit=dep=>{
+    if(dep)needs.forEach((n,i)=>state.trades.push({id:base-needs.length+i,d:n.d,t:'i',p:n.p,u:n.u,s:0,r:0,f:null,b:null,n:'',k:'',c:''}));
+    state.trades.push(...nt);
+    tgPending=tgPending.filter(x=>!items.includes(x));
+    tgRender();render();save();toast('Сделок добавлено: '+nt.length);
+  };
+  if(needs.length)ask('На балансе не хватает '+needs.map(n=>fm(n.u)+' '+(SYM[n.p]||n.p)).join(', ')+' для этих сделок. Записать пополнение и добавить все?',()=>commit(true));
+  else commit(false);
+};
+/* восстановление настроек при загрузке */
+try{
+  $('tg_t').value=localStorage.getItem('p2p_tg_token')||'';
+  $('tg_c').value=localStorage.getItem('p2p_tg_chat')||'';
+  if(localStorage.getItem('p2p_tg_on')==='1'&&$('tg_t').value)tgStart();
+}catch(e){}
+</script>
+<script>
+/* ===== v14: Liquid Glass — каскад вкладок и наклон стекла ===== */
+(function(){
+  const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  /* 1. класс .enter на секции, когда она становится видимой: списки выезжают каскадом */
+  const tm={};
+  const io=new MutationObserver(ms=>ms.forEach(m=>{
+    const s=m.target;if(!(s instanceof HTMLElement)||s.hidden)return;
+    s.classList.remove('enter');void s.offsetWidth;s.classList.add('enter');
+    clearTimeout(tm[s.id]);tm[s.id]=setTimeout(()=>s.classList.remove('enter'),900);
+  }));
+  document.querySelectorAll('.scr').forEach(s=>io.observe(s,{attributes:true,attributeFilter:['hidden']}));
+  /* 2. наклон стеклянных карточек за курсором (только мышь/трекпад, как в iOS) */
+  if(reduce||!matchMedia('(pointer:fine)').matches)return;
+  const SEL='.hero,.tile';
+  let el=null,raf=0,rect=null,lx=0,ly=0;
+  const setTilt=()=>{
+    if(!el||!rect)return;
+    const px=Math.max(-.5,Math.min(.5,(lx-rect.left)/rect.width-.5)),py=Math.max(-.5,Math.min(.5,(ly-rect.top)/rect.height-.5));
+    el.style.transform='perspective(720px) rotateX('+(-py*3.2).toFixed(2)+'deg) rotateY('+(px*3.2).toFixed(2)+'deg) translateZ(0)';
+  };
+  document.addEventListener('pointerover',e=>{
+    const t=e.target&&e.target.closest?e.target.closest(SEL):null;
+    if(t===el)return;
+    if(el){el.style.transform='';el.classList.remove('tiltg')}
+    el=t;
+    if(el){rect=el.getBoundingClientRect();el.classList.add('tiltg')}
+  },{passive:true});
+  document.addEventListener('pointerout',e=>{
+    if(el&&!(e.relatedTarget&&e.relatedTarget.closest&&e.relatedTarget.closest(SEL))){el.style.transform='';el.classList.remove('tiltg');el=null;rect=null}
+  },{passive:true});
+  document.addEventListener('pointermove',e=>{
+    if(!el)return;
+    lx=e.clientX;ly=e.clientY;
+    if(raf)return;
+    raf=requestAnimationFrame(()=>{raf=0;setTilt()});
+  },{passive:true});
+})();
+</script>
+<script>
+/* ===== Оформление — плотность и размытие стекла ===== */
+(function(){
+  let gp=100,gb=18;
+  try{gp=+(localStorage.getItem('p2p_glass_p')||100);gb=+(localStorage.getItem('p2p_glass_b')||18)}catch(e){}
+  const r=$('glo_r'),b=$('glb_r'),rv=$('glo_v'),bv=$('glb_v'),bs=document.body.style;
+  const fill=x=>{if(x)x.style.setProperty('--fill',((x.value-x.min)/(x.max-x.min)*100)+'%')};
+  /* переменные пишем в body, а не в html: иначе срабатывает «плавная смена темы» и все элементы страницы анимируются на каждом шаге ползунка */
+  function applyGlass(){
+    const p=gp/100,dark=isDark();
+    bs.setProperty('--lg-tint',dark?'rgba(255,255,255,'+Math.min(.22,(0.065*p)).toFixed(3)+')':'rgba(255,255,255,'+Math.min(.92,(0.46*p)).toFixed(3)+')');
+    bs.setProperty('--gblur',gb+'px');
+  }
+  const _at=applyTheme;applyTheme=function(){_at();applyGlass()};
+  const save=(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}};
+  if(r&&b){
+    r.value=gp;b.value=gb;
+    const sync=()=>{rv.textContent=gp+'%';bv.textContent=gb+' px';fill(r);fill(b)};
+    let raf=0;const later=()=>{if(raf)return;raf=requestAnimationFrame(()=>{raf=0;applyGlass()})};
+    r.addEventListener('input',()=>{gp=+r.value;fill(r);rv.textContent=gp+'%';later()});
+    b.addEventListener('input',()=>{gb=+b.value;fill(b);bv.textContent=gb+' px';later()});
+    r.addEventListener('change',()=>save('p2p_glass_p',gp));
+    b.addEventListener('change',()=>save('p2p_glass_b',gb));
+    /* на время перетаскивания отключаем плавные переходы — иначе цвет «догоняет» палец с задержкой */
+    const on=()=>document.body.classList.add('gdrag'),off=()=>document.body.classList.remove('gdrag');
+    [r,b].forEach(x=>{x.addEventListener('pointerdown',on);x.addEventListener('touchstart',on,{passive:true});['pointerup','pointercancel','touchend','touchcancel','change','blur'].forEach(ev=>x.addEventListener(ev,off))});
+    sync();
+  }
+  const df=$('look_def');
+  if(df)df.onclick=()=>{gp=100;gb=18;try{localStorage.removeItem('p2p_glass_p');localStorage.removeItem('p2p_glass_b')}catch(e){}if(r&&b){r.value=gp;b.value=gb;rv.textContent=gp+'%';bv.textContent=gb+' px';fill(r);fill(b)}applyGlass();toast('Стекло по умолчанию')};
+  applyGlass();
+  /* статус 'данные в браузере' скрыт полностью */
+  if($('st'))$('st').style.display='none';
+})();
 </script>
 </body>
 </html>
